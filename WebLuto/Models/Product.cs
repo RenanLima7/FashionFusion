@@ -1,12 +1,13 @@
-﻿using FashionFusion.Common;
+﻿using WebLuto.Common;
+using WebLuto.Models.Enums.ProductEnum;
 
-namespace FashionFusion.Models
+namespace WebLuto.Models
 {
     public class Product : BaseEntity
     {
         public string Description { get; set; }
 
-        public decimal Price { get; set; }
+        
 
         #region Add Properties
         /*
@@ -20,5 +21,12 @@ namespace FashionFusion.Models
             produto como cor, peso, dimensões, classificação, etc.
          */
         #endregion
+        public string Name { get; set; }
+
+        public decimal Price { get; set; }
+
+        public ProductType Type { get; set; }
+
+        public bool? Solt { get; set; }
     }
 }

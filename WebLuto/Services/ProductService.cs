@@ -1,8 +1,8 @@
-﻿using FashionFusion.DAO;
-using FashionFusion.Models;
-using FashionFusion.Services.Interfaces;
+﻿using WebLuto.DAO;
+using WebLuto.Models;
+using WebLuto.Services.Interfaces;
 
-namespace FashionFusion.Services
+namespace WebLuto.Services
 {
     public class ProductService : IProductService
     {

@@ -1,8 +1,8 @@
-﻿using FashionFusion.Models;
-using FashionFusion.Services;
+﻿using WebLuto.Models;
+using WebLuto.Services;
 using Microsoft.AspNetCore.Mvc;
 
-namespace FashionFusion.Controllers
+namespace WebLuto.Controllers
 {
     [ApiController]
     [Route("api/[controller]/[action]")]

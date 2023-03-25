@@ -1,4 +1,4 @@
-﻿namespace FashionFusion.Utils
+﻿namespace WebLuto.Utils
 {
     public class UtilityMethods
     {

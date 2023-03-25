@@ -1,6 +1,6 @@
-﻿using FashionFusion.Common;
+﻿using WebLuto.Common;
 
-namespace FashionFusion.Models
+namespace WebLuto.Models
 {
     public class Client : BaseEntity
     {

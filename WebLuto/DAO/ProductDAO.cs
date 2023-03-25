@@ -1,4 +1,4 @@
-﻿namespace FashionFusion.DAO
+﻿namespace WebLuto.DAO
 {
     public class ProductDAO
     {

@@ -1,4 +1,4 @@
-﻿namespace FashionFusion.Mapper
+﻿namespace WebLuto.Mapper
 {
     public class ProductMapper
     {
