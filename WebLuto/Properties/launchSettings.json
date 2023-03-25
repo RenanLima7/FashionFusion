@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "FashionFusion": {
+    "WebLuto": {
       "commandName": "Project",
       "launchBrowser": true,
       "launchUrl": "swagger",
@@ -8,7 +8,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
       "dotnetRunMessages": true,
-      "applicationUrl": "https://localhost:7203;http://localhost:5280"
+      "applicationUrl": "https://localhost:7294;http://localhost:5258"
     },
     "IIS Express": {
       "commandName": "IISExpress",
@@ -31,8 +31,8 @@
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
     "iisExpress": {
-      "applicationUrl": "http://localhost:39476",
-      "sslPort": 44309
+      "applicationUrl": "http://localhost:31478",
+      "sslPort": 44364
     }
   }
 }
