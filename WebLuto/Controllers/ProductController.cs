@@ -1,11 +1,13 @@
-﻿using WebLuto.Models;
-using WebLuto.Services;
+﻿using WebLuto.Services;
 using Microsoft.AspNetCore.Mvc;
+using WebLuto.Models.AbstractModel;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WebLuto.Controllers
 {
     [ApiController]
     [Route("api/[controller]/[action]")]
+    [AllowAnonymous]
     public class ProductController : ControllerBase
     {
         private readonly ProductService _productService;
@@ -16,17 +18,17 @@ namespace WebLuto.Controllers
         }
 
         [HttpDelete(Name = "DeleteProduct")]
-        public async Task<ActionResult> DeleteProduct([FromQuery] long id)
+        public async Task<ActionResult> Delete([FromQuery] long id)
         {
             try
             {
-                Product product = new Product();
-                product = await _productService.GetProductById(id);
+                //Product product = new Product();
+                //product = await _productService.GetProductById(id);
 
-                if (product == null)
+                //if (product == null)
                     return NotFound();
 
-                await _productService.DeleteProduct(product);
+                //await _productService.DeleteProduct(product);
 
                 return Ok(id);
 

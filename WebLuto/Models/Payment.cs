@@ -1,10 +1,13 @@
-﻿using WebLuto.Common;
-using WebLuto.Models.Enums.ProductEnum;
+﻿using WebLuto.Models.Enums.ProductEnum;
 
 namespace WebLuto.Models
 {
-    public class Payment : BaseEntity
+    public class Payment 
     {
+        public List<Product> ProductList { get; set; }
+
+        public Client Client { get; set; }
+
         public PaymentType Type { get; set; }
 
         public decimal TotalValue { get; set; }

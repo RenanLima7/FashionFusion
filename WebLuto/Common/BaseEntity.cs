@@ -1,8 +1,6 @@
-﻿using WebLuto.Common.Interfaces;
-
-namespace WebLuto.Common
+﻿namespace WebLuto.Common
 {
-    public class BaseEntity : IBaseEntity
+    public abstract class BaseEntity
     {
         public long Id { get; set; }
 

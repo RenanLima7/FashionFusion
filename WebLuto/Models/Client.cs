@@ -1,18 +1,9 @@
-﻿using WebLuto.Common;
+﻿using WebLuto.Models.AbstractModel;
 
 namespace WebLuto.Models
 {
-    public class Client : BaseEntity
+    public class Client : Person
     {
-        #region Add Properties
-        /*
-            • nome;
-            • CPF;
-            • e-mail;
-            • telefone;
-            • endereço com CEP;
-            • números dos cartões de crédito;        
-         */
-        #endregion
+        public Address? Address { get; set; }
     }
 }

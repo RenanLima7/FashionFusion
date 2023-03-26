@@ -7,11 +7,11 @@ namespace WebLuto.Services
     public class ProductService : IProductService
     {
 
-        private readonly ProductDAO _productDAO;
+        private readonly ProductRepository _productRepository;
 
-        public ProductService(ProductDAO productDAO)
+        public ProductService(ProductRepository productRepository)
         {
-            _productDAO = productDAO;
+            _productRepository = productRepository;
         }
 
         public Task CreateProduct(Product product)

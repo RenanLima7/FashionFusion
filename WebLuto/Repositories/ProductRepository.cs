@@ -1,6 +1,6 @@
 ﻿namespace WebLuto.DAO
 {
-    public class ProductDAO
+    public class ProductRepository
     {
     }
 }
