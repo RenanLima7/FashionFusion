@@ -1,6 +1,6 @@
-﻿using FashionFusion.Models;
+﻿using WebLuto.Models;
 
-namespace FashionFusion.Services.Interfaces
+namespace WebLuto.Services.Interfaces
 {
     public interface IProductService
     {
