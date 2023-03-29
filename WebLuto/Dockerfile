@@ -7,16 +7,16 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
-COPY ["FashionFusion/FashionFusion.csproj", "FashionFusion/"]
-RUN dotnet restore "FashionFusion/FashionFusion.csproj"
+COPY ["WebLuto/WebLuto.csproj", "WebLuto/"]
+RUN dotnet restore "WebLuto/WebLuto.csproj"
 COPY . .
-WORKDIR "/src/FashionFusion"
-RUN dotnet build "FashionFusion.csproj" -c Release -o /app/build
+WORKDIR "/src/WebLuto"
+RUN dotnet build "WebLuto.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "FashionFusion.csproj" -c Release -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "WebLuto.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "FashionFusion.dll"]
+ENTRYPOINT ["dotnet", "WebLuto.dll"]
