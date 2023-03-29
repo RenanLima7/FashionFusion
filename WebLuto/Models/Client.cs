@@ -1,9 +1,21 @@
-﻿using WebLuto.Models.AbstractModel;
-
-namespace WebLuto.Models
+﻿namespace WebLuto.Models
 {
-    public class Client : Person
+    public class Client
     {
-        public Address? Address { get; set; }
+        public long Id { get; set; }
+
+        public string FirstName { get; set; }
+
+        public string LastName { get; set; }
+
+        public string CPF { get; set; }
+
+        public string Email { get; set; }
+
+        public string? Phone { get; set; }
+
+        public Address Address { get; set; }
+
+        public DateTime? BirthDate { get; set; }
     }
 }

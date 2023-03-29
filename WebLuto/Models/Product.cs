@@ -1,9 +1,8 @@
-﻿using WebLuto.Common;
-using WebLuto.Models.Enums.ProductEnum;
+﻿using WebLuto.Models.Enums.ProductEnum;
 
 namespace WebLuto.Models
 {
-    public class Product : BaseEntity
+    public class Product 
     {
         public long Id { get; set; }
 
@@ -13,6 +12,8 @@ namespace WebLuto.Models
 
         public ProductType Type { get; set; }
 
-        public bool? Solt { get; set; }
+        public string? Dimension { get; set; }
+
+        public bool Quantity { get; set; }
     }
 }

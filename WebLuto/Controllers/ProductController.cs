@@ -1,7 +1,6 @@
-﻿using WebLuto.Services;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using WebLuto.Models.AbstractModel;
-using Microsoft.AspNetCore.Authorization;
+using WebLuto.Services;
 
 namespace WebLuto.Controllers
 {
