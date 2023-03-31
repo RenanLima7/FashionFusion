@@ -8,7 +8,7 @@ namespace WebLuto.Repositories.Interfaces
 
         Task<User> GetUserById(long id);
 
-        Task<User> GetUserByLogin(string username, string password);
+        Task<User> GetUserByUserName(string username);
 
         Task<User> CreateUser(User user);
 
