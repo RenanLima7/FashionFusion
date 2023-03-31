@@ -24,9 +24,9 @@ namespace WebLuto.Repositories
             return await _dbContext.User.FirstOrDefaultAsync(x => x.Id == id);
         }
 
-        public Task<User> GetUserByLogin(string username, string password)
-        {
-            throw new NotImplementedException();
+        public async Task<User> GetUserByUserName(string username) 
+        { 
+            return await _dbContext.User.FirstOrDefaultAsync(x => x.Username == username);
         }
 
         public async Task<User> CreateUser(User user)

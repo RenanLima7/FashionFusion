@@ -33,18 +33,9 @@ namespace WebLuto.Services
             throw new NotImplementedException();
         }
 
-        public Task<User> GetUserByLogin(string username, string password)
+        public Task<User> GetUserByUserName(string username)
         {
-            try
-            {
-                Task<User> user = _userRepository.GetUserByLogin(username, password);
-
-                return user;
-            }
-            catch (Exception)
-            {
-                return null;
-            }            
+            return _userRepository.GetUserByUserName(username);
         }
     }
 }

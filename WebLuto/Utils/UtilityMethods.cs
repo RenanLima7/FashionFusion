@@ -1,37 +1,31 @@
-﻿using System.Security.Cryptography;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace WebLuto.Utils
 {
     public static class UtilityMethods
     {
-        public static string EncryptPassword(string password)
+        public static KeyValuePair<string, HashSet<string>>[] GetFieldsErrors(ModelStateDictionary ModelState)
         {
-            byte[] passwordBytes = Encoding.UTF8.GetBytes(password);
-            byte[] hashBytes;
-
-            using (SHA512 shaM = new SHA512Managed())
+            Dictionary<string, HashSet<string>> fieldsErrors = new Dictionary<string, HashSet<string>>();
+            foreach (string key in ModelState.Keys)
             {
-                hashBytes = shaM.ComputeHash(passwordBytes);
+                if (ModelState[key].Errors.Count > 0)
+                {
+                    HashSet<string> errors = new HashSet<string>();
+                    foreach (var error in ModelState[key].Errors)
+                    {
+                        errors.Add(error.ErrorMessage);
+                    }
+                    fieldsErrors.Add(key, errors);
+                }
+                else
+                {
+                    fieldsErrors.Add(key, new HashSet<string>());
+                }
             }
-
-            return Convert.ToBase64String(hashBytes);
-        }
-
-
-        public static bool VerifyPassword(string enteredPassword, string storedPassword)
-        {
-            byte[] enteredPasswordBytes = Encoding.UTF8.GetBytes(enteredPassword);
-            byte[] hashBytes;
-
-            using (SHA512 shaM = new SHA512Managed())
-            {
-                hashBytes = shaM.ComputeHash(enteredPasswordBytes);
-            }
-
-            string calculatedStoredPassword = Convert.ToBase64String(hashBytes);
-
-            return storedPassword.Equals(calculatedStoredPassword);
+            return fieldsErrors.ToArray();
         }
     }
 }
