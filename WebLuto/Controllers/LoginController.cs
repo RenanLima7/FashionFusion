@@ -10,7 +10,7 @@ namespace WebLuto.Controllers
 {
     public class LoginController : ControllerBase
     {
-        [HttpGet]
+        [HttpPost]
         [Route("Login")]
         [AllowAnonymous]
         public async Task<ActionResult<dynamic>> Login([FromBody] UserDTO userDTO)
@@ -23,7 +23,7 @@ namespace WebLuto.Controllers
                 Type = UserType.Admin
             }; // REPOSITORY > GET BY ID
 
-            User user = Mapper.Mapper.MapUserDTOToUser(userDTO);
+            User user = null;// Mapper.UserMap.MapUserDTOToUser(userDTO);
 
             if (user == null)
                 return NotFound(new { Sucess = false, Message = "Usuário ou senha inválidos!" });
@@ -35,12 +35,15 @@ namespace WebLuto.Controllers
 
             user.Password = string.Empty;
 
-            return new
-            {
-                Sucess = true,
-                User = user,
-                Token = token
-            };
+            return Ok(
+                new
+                {
+                    Sucess = true,
+                    User = user,
+                    Token = token
+                }
+            );
+
         }
 
         [HttpGet]

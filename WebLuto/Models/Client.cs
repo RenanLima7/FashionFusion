@@ -17,5 +17,7 @@
         public Address Address { get; set; }
 
         public DateTime? BirthDate { get; set; }
+
+        public string? ProfileImageUrl { get; set; }
     }
 }

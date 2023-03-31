@@ -4,6 +4,7 @@ namespace WebLuto.Models
 {
     public class Sale 
     {
+        public long id { get; set; }
         public List<Product> ProductList { get; set; }
 
         public Client Client { get; set; }

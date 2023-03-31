@@ -4,8 +4,6 @@
     {
         public long Id { get; set; }
 
-        public Client Client { get; set; }
-
         public string AddressLine { get; set; }
 
         public string AddressLineNumber { get; set; }

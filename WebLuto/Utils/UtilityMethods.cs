@@ -3,7 +3,7 @@ using System.Text;
 
 namespace WebLuto.Utils
 {
-    public class UtilityMethods
+    public static class UtilityMethods
     {
         public static string EncryptPassword(string password)
         {

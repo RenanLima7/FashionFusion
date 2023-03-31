@@ -17,7 +17,8 @@ namespace WebLuto.Services
             try
             {
                 JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
-                byte[] key = Encoding.ASCII.GetBytes(Settings.SecretKey);
+
+                byte[] secretKey = Encoding.ASCII.GetBytes(new Settings().GetKeyValue("SecretKey"));
 
                 SecurityTokenDescriptor tokenDescriptor = new SecurityTokenDescriptor
                 {
@@ -27,7 +28,7 @@ namespace WebLuto.Services
                     new Claim(ClaimTypes.Role, user.Type.ToString())
                     }),
                     Expires = DateTime.UtcNow.AddHours(2),
-                    SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256)
+                    SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(secretKey), SecurityAlgorithms.HmacSha256)
                 };
 
                 SecurityToken securityToken = tokenHandler.CreateToken(tokenDescriptor);

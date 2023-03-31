@@ -1,7 +1,21 @@
-﻿namespace WebLuto.Security
+﻿using Microsoft.Extensions.Configuration;
+
+namespace WebLuto.Security
 {
-    public static class Settings
+    public class Settings
     {
-        public static string SecretKey = "5cde6f45-02c3-4e04-b40a-8313487e972a";
+        private readonly IConfiguration _configuration;
+
+        public Settings() { }
+
+        public Settings(IConfiguration configuration)
+        {
+            _configuration = configuration;
+        }
+
+        public string GetKeyValue(string key)
+        {
+            return _configuration.GetValue<string>(key);
+        }
     }
 }

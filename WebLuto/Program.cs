@@ -1,7 +1,10 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.DataProtection.KeyManagement;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using WebLuto.Data;
+using WebLuto.Repositories;
+using WebLuto.Repositories.Interfaces;
 using WebLuto.Security;
 
 namespace WebLuto
@@ -16,7 +19,17 @@ namespace WebLuto
 
             builder.Services.AddCors();
 
-            byte[] key = Encoding.ASCII.GetBytes(Settings.SecretKey);
+            #region Secret Key
+
+            var configurationBuilder = new ConfigurationBuilder().AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+            var configuration = configurationBuilder.Build();
+
+            var settings = new Settings(configuration);
+            byte[] secretKey = Encoding.ASCII.GetBytes(settings.GetKeyValue("SecretKey"));
+
+            #endregion
+
+            #region JWT Authorization
 
             builder.Services.AddAuthentication(x =>
             {
@@ -30,11 +43,20 @@ namespace WebLuto
                 x.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    IssuerSigningKey = new SymmetricSecurityKey(secretKey),
                     ValidateIssuer = false,
                     ValidateAudience = false
                 };
             });
+
+            #endregion
+
+            builder.Services.AddEntityFrameworkSqlServer()
+                .AddDbContext<WLDBContext>(
+                    options => options.UseSqlServer(builder.Configuration.GetConnectionString("DataBase"))
+                );
+
+            builder.Services.AddScoped<IUserRepository, UserRepository>();
 
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
