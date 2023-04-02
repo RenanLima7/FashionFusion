@@ -8,7 +8,7 @@ namespace WebLuto.Models
 
         public string Password { get; set; }
 
-        public int Salt { get; set; }
+        public long Salt { get; set; }
 
         public UserType Type { get; set; }
     }

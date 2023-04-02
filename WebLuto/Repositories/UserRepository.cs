@@ -2,6 +2,8 @@
 using WebLuto.Data;
 using WebLuto.Models;
 using WebLuto.Repositories.Interfaces;
+using WebLuto.Security;
+using WebLuto.Utils;
 
 namespace WebLuto.Repositories
 {
@@ -18,7 +20,9 @@ namespace WebLuto.Repositories
         {
             try
             {
-                return await _dbContext.User.ToListAsync();
+                return await _dbContext.User
+                    .Where(x => x.DeletionDate == null)
+                    .ToListAsync();
             }
             catch (Exception ex)
             {
@@ -30,7 +34,11 @@ namespace WebLuto.Repositories
         {
             try
             {
-                return await _dbContext.User.FirstOrDefaultAsync(x => x.Id == id);
+                return await _dbContext.User.FirstOrDefaultAsync
+                (
+                    x => x.Id == id &&
+                    x.DeletionDate == null
+                );
             }
             catch (Exception ex)
             {
@@ -42,7 +50,11 @@ namespace WebLuto.Repositories
         {
             try
             {
-                return await _dbContext.User.FirstOrDefaultAsync(x => x.Username == username);
+                return await _dbContext.User.FirstOrDefaultAsync
+                (
+                    x => x.Username == username &&
+                    x.DeletionDate == null
+                );
             }
             catch (Exception ex)
             {
@@ -55,6 +67,8 @@ namespace WebLuto.Repositories
             try
             {
                 user.CreationDate = DateTime.Now;
+                user.Salt = UtilityMethods.GenerateSaltAsLong();
+                user.Password = Sha512Cryptographer.Encrypt(user.Password, user.Salt);
 
                 await _dbContext.User.AddAsync(user);
                 await _dbContext.SaveChangesAsync();
@@ -77,7 +91,7 @@ namespace WebLuto.Repositories
                     throw new Exception("Não foi possível encontrar um usuário com o ID: " + id);
 
                 userExists.Username = user.Username;
-                userExists.Password = user.Password;
+                userExists.Password = Sha512Cryptographer.Encrypt(user.Password, userExists.Salt);
                 userExists.Type = user.Type;
                 userExists.UpdateDate = DateTime.Now;
 
@@ -104,8 +118,8 @@ namespace WebLuto.Repositories
                 //_dbContext.User.Remove(userExists);
 
                 userExists.DeletionDate = DateTime.Now;
-                _dbContext.User.Update(userExists);
 
+                _dbContext.User.Update(userExists);
                 await _dbContext.SaveChangesAsync();
 
                 return true;

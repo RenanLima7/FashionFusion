@@ -1,4 +1,6 @@
-﻿using WebLuto.Models;
+﻿using WebLuto.DataContract.Requests;
+using WebLuto.DataContract.Responses;
+using WebLuto.Models;
 using WebLuto.Repositories.Interfaces;
 using WebLuto.Services.Interfaces;
 
@@ -59,9 +61,9 @@ namespace WebLuto.Services
         {
             try
             {
-                User userCrated = await _userRepository.CreateUser(user);
+                User userCreated = await _userRepository.CreateUser(user);
 
-                return userCrated;
+                return userCreated;
             }
             catch (Exception ex)
             {

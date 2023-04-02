@@ -1,4 +1,5 @@
-﻿using WebLuto.Models;
+﻿using WebLuto.DataContract.Requests;
+using WebLuto.Models;
 
 namespace WebLuto.Services.Interfaces
 {

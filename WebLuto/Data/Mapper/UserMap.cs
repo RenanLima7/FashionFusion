@@ -10,9 +10,9 @@ namespace WebLuto.Data.Mapper
         public void Configure(EntityTypeBuilder<User> builder)
         {
             builder.HasKey(x => x.Id);
-            builder.Property(x => x.Username).IsRequired().HasMaxLength(100);
-            builder.Property(x => x.Password).IsRequired().HasMaxLength(50);
-            builder.Property(x => x.Type).IsRequired().HasDefaultValue(UserType.Client);
+            builder.Property(x => x.Username).IsRequired();
+            builder.Property(x => x.Password).IsRequired();
+            builder.Property(x => (x.Type)).IsRequired();
         }
     }
 }

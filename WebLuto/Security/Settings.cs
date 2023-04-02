@@ -1,21 +1,25 @@
-﻿using Microsoft.Extensions.Configuration;
-
-namespace WebLuto.Security
+﻿namespace WebLuto.Security
 {
     public class Settings
     {
         private readonly IConfiguration _configuration;
 
-        public Settings() { }
+        private readonly IConfigurationBuilder _configurationBuilder;
 
-        public Settings(IConfiguration configuration)
-        {
-            _configuration = configuration;
+        private readonly IConfigurationRoot _configurationRoot;
+
+        public Settings() {
+            _configurationBuilder = new ConfigurationBuilder().AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+            _configurationRoot = _configurationBuilder.Build();
+            _configuration = _configurationRoot;
         }
 
-        public string GetKeyValue(string key)
+        public string SecretKey
         {
-            return _configuration.GetValue<string>(key);
+            get
+            {
+                return _configuration.GetValue<string>("SecretKey"); 
+            }
         }
     }
 }

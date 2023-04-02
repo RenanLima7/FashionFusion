@@ -18,7 +18,7 @@ namespace WebLuto.Services
             {
                 JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
 
-                byte[] secretKey = Encoding.ASCII.GetBytes(new Settings().GetKeyValue("SecretKey"));
+                byte[] secretKey = Encoding.ASCII.GetBytes(new Settings().SecretKey);
 
                 SecurityTokenDescriptor tokenDescriptor = new SecurityTokenDescriptor
                 {
@@ -38,6 +38,32 @@ namespace WebLuto.Services
             catch (Exception ex)
             {
                 throw new Exception($"Houve um erro ao gerar o token! \nErro - {ex}");
+            }
+        }
+
+        public void IsValidToken(string authorizationHeader)
+        {
+            if (string.IsNullOrEmpty(authorizationHeader) || !authorizationHeader.StartsWith("Bearer "))
+                throw new Exception("Token de autorização inválido");
+
+            string token = authorizationHeader.Substring("Bearer ".Length).Trim();
+
+            if (IsExpiredToken(token))
+                throw new Exception("Token de autorização expirado!");
+        }
+
+        public bool IsExpiredToken(string token)
+        {
+            try
+            {
+                JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
+                JwtSecurityToken jwtToken = handler.ReadJwtToken(token);
+
+                return jwtToken.ValidTo < DateTime.UtcNow;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Erro ao verificar a validade do token! \nErro - {ex}");
             }
         }
     }

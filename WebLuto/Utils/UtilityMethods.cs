@@ -27,5 +27,13 @@ namespace WebLuto.Utils
             }
             return fieldsErrors.ToArray();
         }
+
+        public static long GenerateSaltAsLong()
+        {
+            byte[] salt = new byte[16];
+            new RNGCryptoServiceProvider().GetBytes(salt);
+
+            return BitConverter.ToInt64(salt, 0);
+        }
     }
 }
