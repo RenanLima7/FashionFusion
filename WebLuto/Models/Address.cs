@@ -1,6 +1,6 @@
 ﻿namespace WebLuto.Models
 {
-    public class Address
+    public class Address //: BaseEntity
     {
         public long Id { get; set; }
 

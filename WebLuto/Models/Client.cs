@@ -1,6 +1,6 @@
 ﻿namespace WebLuto.Models
 {
-    public class Client
+    public class Client //: BaseEntity
     {
         public long Id { get; set; }
 

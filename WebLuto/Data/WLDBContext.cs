@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using WebLuto.Mapper;
+using WebLuto.Data.Mapper;
 using WebLuto.Models;
 
 namespace WebLuto.Data

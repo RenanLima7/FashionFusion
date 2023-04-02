@@ -4,14 +4,16 @@ namespace WebLuto.Services.Interfaces
 {
     public interface IUserService
     {
+        Task<List<User>> GetAllUsers();
+
         Task<User> GetUserById(long id);
 
-        Task<User> GetUserByUserName(string username);
+        Task<User> GetUserByUsername(string username);
 
-        Task CreateUser(User user);
+        Task<User> CreateUser(User user);
 
-        Task UpdateUser(User user, long id);
+        Task<User> UpdateUser(User user, long id);
 
-        Task DeleteUser(long id);
+        Task<bool> DeleteUser(long id);
     }
 }

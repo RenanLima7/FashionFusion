@@ -1,41 +1,98 @@
 ﻿using WebLuto.Models;
-using WebLuto.Repositories;
+using WebLuto.Repositories.Interfaces;
 using WebLuto.Services.Interfaces;
 
 namespace WebLuto.Services
 {
     public class UserService : IUserService
     {
-        private readonly UserRepository _userRepository;
+        private readonly IUserRepository _userRepository;
 
-        public UserService(UserRepository userRepository)
+        public UserService(IUserRepository userRepository)
         {
             _userRepository = userRepository;
         }
 
-        public Task CreateUser(User user)
+        public async Task<List<User>> GetAllUsers()
         {
-            throw new NotImplementedException();
+            try
+            {
+                List<User> userList = await _userRepository.GetAllUsers();
+
+                return userList;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
 
-        public Task UpdateUser(User user, long id)
+        public async Task<User> GetUserById(long id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                User user = await _userRepository.GetUserById(id);
+
+                return user;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
 
-        public Task DeleteUser(long id)
+        public async Task<User> GetUserByUsername(string username)
         {
-            throw new NotImplementedException();
+            try
+            {
+                User user = await _userRepository.GetUserByUsername(username);
+
+                return user;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
 
-        public Task<User> GetUserById(long id)
+        public async Task<User> CreateUser(User user)
         {
-            throw new NotImplementedException();
+            try
+            {
+                User userCrated = await _userRepository.CreateUser(user);
+
+                return userCrated;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
 
-        public Task<User> GetUserByUserName(string username)
+        public async Task<User> UpdateUser(User user, long id)
         {
-            return _userRepository.GetUserByUserName(username);
+            try
+            {
+                User userUpdated = await _userRepository.GetUserById(id);
+
+                return userUpdated;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<bool> DeleteUser(long id)
+        {
+            try
+            {
+                return await _userRepository.DeleteUser(id);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
     }
 }

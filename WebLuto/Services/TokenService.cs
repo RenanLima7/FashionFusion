@@ -24,8 +24,8 @@ namespace WebLuto.Services
                 {
                     Subject = new ClaimsIdentity(new Claim[]
                     {
-                    new Claim(ClaimTypes.Name, user.Username.ToString()),
-                    new Claim(ClaimTypes.Role, user.Type.ToString())
+                        new Claim(ClaimTypes.Name, user.Username.ToString()),
+                        new Claim(ClaimTypes.Role, user.Type.ToString())
                     }),
                     Expires = DateTime.UtcNow.AddHours(2),
                     SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(secretKey), SecurityAlgorithms.HmacSha256)
@@ -37,7 +37,7 @@ namespace WebLuto.Services
             }
             catch (Exception ex)
             {
-                return "ERROR - { " + ex + " }";
+                throw new Exception($"Houve um erro ao gerar o token! \nErro - {ex}");
             }
         }
     }

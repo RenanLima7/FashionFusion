@@ -6,6 +6,8 @@ using WebLuto.Data;
 using WebLuto.Repositories;
 using WebLuto.Repositories.Interfaces;
 using WebLuto.Security;
+using WebLuto.Services;
+using WebLuto.Services.Interfaces;
 
 namespace WebLuto
 {
@@ -15,9 +17,22 @@ namespace WebLuto
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            builder.Services.AddControllers();
+            #region Services
 
+            builder.Services.AddAutoMapper(typeof(Mapper.Mapper));
+            builder.Services.AddControllers();
             builder.Services.AddCors();
+            builder.Services.AddEndpointsApiExplorer();
+            builder.Services.AddSwaggerGen();
+
+            #endregion
+
+            #region Scopes
+
+            builder.Services.AddScoped<IUserRepository, UserRepository>();
+            builder.Services.AddScoped<IUserService, UserService>();
+
+            #endregion
 
             #region Secret Key
 
@@ -51,15 +66,14 @@ namespace WebLuto
 
             #endregion
 
+            #region DataBase Connection
+
             builder.Services.AddEntityFrameworkSqlServer()
                 .AddDbContext<WLDBContext>(
                     options => options.UseSqlServer(builder.Configuration.GetConnectionString("DataBase"))
                 );
 
-            builder.Services.AddScoped<IUserRepository, UserRepository>();
-
-            builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+            #endregion
 
             var app = builder.Build();
 

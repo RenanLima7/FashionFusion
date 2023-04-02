@@ -1,10 +1,14 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using WebLuto.DataContract.Requests;
+using WebLuto.DataContract.Responses;
 using WebLuto.Models;
 using WebLuto.Models.DTO;
-using WebLuto.Models.Enums.UserEnum;
 using WebLuto.Security;
 using WebLuto.Services;
+using WebLuto.Services.Interfaces;
+using WebLuto.Utils;
 
 namespace WebLuto.Controllers
 {
@@ -12,76 +16,77 @@ namespace WebLuto.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        private readonly UserService _userService;
+        private readonly IUserService _userService;
 
-        public UserController(UserService userService)
+        private readonly IMapper _mapper;
+
+        public UserController(IUserService userService, IMapper mapper)
         {
             _userService = userService;
+            _mapper = mapper;
         }
 
         [HttpPost]
         [Route("Login")]
         [AllowAnonymous]
-        public async Task<ActionResult<dynamic>> Login([FromBody] LoginDTO loginDTO)
+        public async Task<ActionResult<dynamic>> Login([FromBody] LoginRequest loginRequest)
         {
             try
             {
-                if (!ModelState.IsValid)
+                //TryValidateModel(loginRequest);
+
+                //if (!ModelState.IsValid)
+                //{
+                //    UtilityMethods.GetFieldsErrors(ModelState);
+                //}
+
+                User user = await _userService.GetUserByUsername(loginRequest.Username);
+
+                if (user == null)
+                    return NotFound(new { Sucess = false, Message = $"Não foi encontrado nemhum usuário com o username: {loginRequest.Username}" });
+
+                bool isValidPassword = Sha512Cryptographer.Compare(loginRequest.Password, user.Salt, user.Password);
+
+                if (isValidPassword)
                 {
-                    return BadRequest(ModelState);
+                    string jwtToken = new TokenService().GenerateToken(user);
+
+                    LoginResponse loginResponse = _mapper.Map<LoginResponse>(user);
+
+                    return Ok(new { Sucess = true, User = loginResponse, Token = jwtToken });
                 }
                 else
-                {
-                    User user = await _userService.GetUserByUserName(loginDTO.Username);
-
-                    if (user == null)
-                        return NotFound(new { Sucess = false, Message = "Usuário não encontrado!" });
-
-                    string token = new TokenService().GenerateToken(user);
-
-                    if (token.Contains("ERROR"))
-                        return BadRequest(new { Sucess = false, Message = "Houve um erro ao gerar o token!", Exception = token });
-
-                    bool passwordPwd = Sha512Cryptographer.Compare(loginDTO.Password, user.Salt, user.Password);
-
-                    if (passwordPwd)
-                        return Ok(new { Sucess = true, User = user, Token = token });
-                    else
-                        return NotFound(new { Sucess = false, Message = "Usuário ou senha inválidos!" });
-                }
+                    return NotFound(new { Sucess = false, Message = "Usuário ou senha inválidos!" });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { Sucess = false, Message = "Houve um erro no sistema: " + ex });
+                return StatusCode(500, new { Sucess = false, ex.Message, Exception = ex.InnerException });
             }
         }
 
         [HttpGet]
-        public IEnumerable<string> Get()
-        {
-            return new string[] { "value1", "value2" };
-        }
+        [Route("Anonymous")]
+        [AllowAnonymous]
+        public string Anonymous() => "Anônimo";
 
-        [HttpGet("{id}")]
-        public string Get(int id)
-        {
-            return "value";
-        }
+        [HttpGet]
+        [Route("Authenticated")]
+        [Authorize]
+        public string Authenticated() => string.Format("Autenticado - {0}", User.Identity.Name);
 
-        [HttpPost]
-        public ActionResult Post([FromBody] UserDTO user)
-        {
-            return Ok(new { user });
-        }
+        [HttpGet]
+        [Route("Client")]
+        [Authorize(Roles = "0, 1, 2")]
+        public string Client() => "Cliente";
 
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
+        [HttpGet]
+        [Route("Employee")]
+        [Authorize(Roles = "0, 1")]
+        public string Employee() => "Funcionário";
 
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
-        }
+        [HttpGet]
+        [Route("Admin")]
+        [Authorize(Roles = "0, 1")]
+        public string Admin() => "Administrador";
     }
 }

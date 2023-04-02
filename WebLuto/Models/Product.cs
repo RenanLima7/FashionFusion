@@ -2,7 +2,7 @@
 
 namespace WebLuto.Models
 {
-    public class Product 
+    public class Product //: BaseEntity
     {
         public long Id { get; set; }
 

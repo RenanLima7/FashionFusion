@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using WebLuto.Models;
 using WebLuto.Models.Enums.UserEnum;
 
-namespace WebLuto.Mapper
+namespace WebLuto.Data.Mapper
 {
     public class UserMap : IEntityTypeConfiguration<User>
     {
