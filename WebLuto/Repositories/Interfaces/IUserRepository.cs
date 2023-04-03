@@ -13,8 +13,8 @@ namespace WebLuto.Repositories.Interfaces
 
         Task<User> CreateUser(User user);
 
-        Task<User> UpdateUser(User user, long id);
+        Task<User> UpdateUser(User userToUpdate, User existingUser);
 
-        Task<bool> DeleteUser(long id);
+        Task<bool> DeleteUser(User user);
     }
 }

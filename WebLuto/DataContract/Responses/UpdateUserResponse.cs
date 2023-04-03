@@ -10,8 +10,6 @@ namespace WebLuto.DataContract.Responses
 
         public UserType Type { get; set; }
 
-        public DateTime CreationDate { get; set; }
-
         public DateTime UpdateDate { get; set; }
     }
 }

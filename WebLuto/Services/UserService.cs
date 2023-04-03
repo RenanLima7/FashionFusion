@@ -57,11 +57,11 @@ namespace WebLuto.Services
             }
         }
 
-        public async Task<User> CreateUser(User user)
+        public async Task<User> CreateUser(User userToCreate)
         {
             try
             {
-                User userCreated = await _userRepository.CreateUser(user);
+                User userCreated = await _userRepository.CreateUser(userToCreate);
 
                 return userCreated;
             }
@@ -71,11 +71,11 @@ namespace WebLuto.Services
             }
         }
 
-        public async Task<User> UpdateUser(User user, long id)
+        public async Task<User> UpdateUser(User userToUpdate, User existingUser)
         {
             try
             {
-                User userUpdated = await _userRepository.UpdateUser(user, id);
+                User userUpdated = await _userRepository.UpdateUser(userToUpdate, existingUser);
 
                 return userUpdated;
             }
@@ -85,11 +85,11 @@ namespace WebLuto.Services
             }
         }
 
-        public async Task<bool> DeleteUser(long id)
+        public async Task<bool> DeleteUser(User userToDelete)
         {
             try
             {
-                return await _userRepository.DeleteUser(id);
+                return await _userRepository.DeleteUser(userToDelete);
             }
             catch (Exception ex)
             {

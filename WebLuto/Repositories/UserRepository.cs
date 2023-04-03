@@ -62,18 +62,18 @@ namespace WebLuto.Repositories
             }
         }
 
-        public async Task<User> CreateUser(User user)
+        public async Task<User> CreateUser(User userToCreate)
         {
             try
             {
-                user.CreationDate = DateTime.Now;
-                user.Salt = UtilityMethods.GenerateSaltAsLong();
-                user.Password = Sha512Cryptographer.Encrypt(user.Password, user.Salt);
+                userToCreate.CreationDate = DateTime.Now;
+                userToCreate.Salt = UtilityMethods.GenerateSaltAsLong();
+                userToCreate.Password = Sha512Cryptographer.Encrypt(userToCreate.Password, userToCreate.Salt);
 
-                await _dbContext.User.AddAsync(user);
+                await _dbContext.User.AddAsync(userToCreate);
                 await _dbContext.SaveChangesAsync();
 
-                return user;
+                return userToCreate;
             }
             catch (Exception)
             {
@@ -81,52 +81,42 @@ namespace WebLuto.Repositories
             }
         }
 
-        public async Task<User> UpdateUser(User user, long id)
+        public async Task<User> UpdateUser(User userToUpdate, User existingUser)
         {
             try
-            {
-                User userExists = await GetUserById(id);
+            {                
+                existingUser.Username = userToUpdate.Username ?? existingUser.Username;
+                existingUser.Password = userToUpdate.Password != null ? Sha512Cryptographer.Encrypt(userToUpdate.Password, existingUser.Salt) : existingUser.Password;
+                existingUser.Type = userToUpdate.Type != existingUser.Type ? userToUpdate.Type : existingUser.Type;
+                existingUser.UpdateDate = DateTime.Now;
 
-                if (userExists == null)
-                    throw new Exception("Não foi possível encontrar um usuário com o ID: " + id);
-
-                userExists.Username = user.Username ?? userExists.Username;
-                userExists.Password = user.Password != null ? Sha512Cryptographer.Encrypt(user.Password, userExists.Salt) : userExists.Password;
-                userExists.Type = user.Type != userExists.Type ? user.Type : userExists.Type;
-                userExists.UpdateDate = DateTime.Now;
-
-                _dbContext.User.Update(userExists);
+                _dbContext.User.Update(existingUser);
                 await _dbContext.SaveChangesAsync();
 
-                return userExists;
+                return existingUser;
             }
             catch (Exception)
             {
-                throw new Exception(string.Format("Erro ao atualizar o usuário: {0}", id));
+                throw new Exception(string.Format("Erro ao atualizar o usuário: {0}", existingUser.Id));
             }
         }
 
-        public async Task<bool> DeleteUser(long id)
+        public async Task<bool> DeleteUser(User userToDelete) 
         {
             try
             {
-                User userExists = await GetUserById(id);
-
-                if (userExists == null)
-                    throw new Exception("Não foi possível encontrar um usuário com o ID: " + id);
-
                 //_dbContext.User.Remove(userExists);
 
-                userExists.DeletionDate = DateTime.Now;
+                userToDelete.DeletionDate = DateTime.Now;
 
-                _dbContext.User.Update(userExists);
+                _dbContext.User.Update(userToDelete);
                 await _dbContext.SaveChangesAsync();
 
                 return true;
             }
             catch (Exception)
             {
-                throw new Exception(string.Format("Erro ao deletar o usuário: {0}", id));
+                throw new Exception(string.Format("Erro ao deletar o usuário: {0}", userToDelete.Id));
             }
         }
     }

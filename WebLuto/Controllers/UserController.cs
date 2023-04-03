@@ -30,6 +30,7 @@ namespace WebLuto.Controllers
 
         [HttpPost]
         [Route("Login")]
+        [AllowAnonymous]
         public async Task<ActionResult<dynamic>> Login([FromBody] LoginRequest loginRequest)
         {
             try
@@ -112,12 +113,13 @@ namespace WebLuto.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { Success = false, ex.Message, Exception = ex.InnerException });
+                return BadRequest(new { Success = false, ex.Message });
             }
         }
 
         [HttpPost]
         [Route("CreateUser")]
+        [AllowAnonymous] // Temp
         public async Task<ActionResult<dynamic>> CreateUser([FromBody] CreateUserRequest userRequest)
         {
             try
@@ -139,32 +141,33 @@ namespace WebLuto.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new { Success = false, ex.Message, Exception = ex });
+                return BadRequest(new { Success = false, ex.Message });
             }
         }
 
         [HttpPut]
         [Route("UpdateUser/{id}")]
-        public async Task<ActionResult<dynamic>> UpdateUser([FromBody] CreateUserRequest userRequest, long id)
+        public async Task<ActionResult<dynamic>> UpdateUser([FromBody] UpdateUserRequest userRequest, long id)
         {
             try
             {
-                User userExists = await _userService.GetUserById(id);
+                User existingUser = await _userService.GetUserById(id);
 
-                if (userExists == null)
+                if (existingUser == null)
                     return NotFound(new { Success = false, Message = $"Não foi encontrado nenhum usuário com o Id: {id}" });
 
-                if (!string.IsNullOrEmpty(userRequest.Password))
+                if (!string.IsNullOrEmpty(userRequest.Username))
                 {
                     User userByUsername = await _userService.GetUserByUsername(userRequest.Username);
 
+                    // TODO: Validação para caso seja o próprio usuário
                     if (userByUsername != null)
                         return Conflict(new { Success = false, Message = $"Já existe um usuário com o username: {userRequest.Username}" });
                 }
 
                 User userToUpdated = _mapper.Map<User>(userRequest);
 
-                User userUpdated = await _userService.UpdateUser(userToUpdated, id);
+                User userUpdated = await _userService.UpdateUser(userToUpdated, existingUser);
 
                 UpdateUserResponse userResponse = _mapper.Map<UpdateUserResponse>(userUpdated);
 
@@ -172,7 +175,31 @@ namespace WebLuto.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new { Success = false, ex.Message, Exception = ex });
+                return BadRequest(new { Success = false, ex.Message });
+            }
+        }
+
+        [HttpDelete]
+        [Route("DeleteUser/{id}")]
+        public async Task<ActionResult<dynamic>> DeleteUser(long id)
+        {
+            try
+            {
+                User existingUser = await _userService.GetUserById(id);
+
+                if (existingUser == null)
+                    return NotFound(new { Success = false, Message = $"Não foi encontrado nenhum usuário com o Id: {id}" });
+
+                bool successDeletedUser = await _userService.DeleteUser(existingUser);
+
+                if (successDeletedUser)
+                    return Ok(new { Success = true, User = $"Usuário {existingUser.Id} excluído com sucesso!" });
+                else
+                    return BadRequest(new { Success = false, User = $"Erro ao excluir o usuário {existingUser.Id}!" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Success = false, ex.Message });
             }
         }
 

@@ -7,8 +7,8 @@ namespace WebLuto.Models.Enums.UserEnum
         [Description("Administrador")]
         Admin = 0,
         [Description("Funcionário")]
-        Employee = 1,
-        [Description("Cliente")]
-        Client = 2
+        Employee = 1
+        //[Description("Cliente")]
+        //Client = 2
     }
 }
