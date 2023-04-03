@@ -30,7 +30,6 @@ namespace WebLuto.Controllers
 
         [HttpPost]
         [Route("Login")]
-        [AllowAnonymous]
         public async Task<ActionResult<dynamic>> Login([FromBody] LoginRequest loginRequest)
         {
             try
@@ -78,7 +77,7 @@ namespace WebLuto.Controllers
                     return NotFound(new { Success = false, Message = $"Não foi encontrado nenhum usuário com o Id: {userId}" });
                 else
                 {
-                    UserResponse userResponse = _mapper.Map<UserResponse>(user);
+                    CreateUserResponse userResponse = _mapper.Map<CreateUserResponse>(user);
 
                     return Ok(new { Success = true, User = userResponse });
                 }
@@ -101,11 +100,11 @@ namespace WebLuto.Controllers
                     return NotFound(new { Success = false, Message = $"Não foi encontrado nenhum usuário" });
                 else
                 {
-                    List<UserResponse> userResponseList = new List<UserResponse>();
+                    List<CreateUserResponse> userResponseList = new List<CreateUserResponse>();
 
                     foreach (User user in userList)
                     {
-                        userResponseList.Add(_mapper.Map<UserResponse>(user));
+                        userResponseList.Add(_mapper.Map<CreateUserResponse>(user));
                     }
 
                     return Ok(new { Success = true, UserList = userResponseList });
@@ -119,8 +118,7 @@ namespace WebLuto.Controllers
 
         [HttpPost]
         [Route("CreateUser")]
-        [AllowAnonymous]
-        public async Task<ActionResult<dynamic>> CreateUser([FromBody] UserRequest userRequest)
+        public async Task<ActionResult<dynamic>> CreateUser([FromBody] CreateUserRequest userRequest)
         {
             try
             {
@@ -134,7 +132,7 @@ namespace WebLuto.Controllers
 
                     User userCreated = await _userService.CreateUser(user);
 
-                    UserResponse userResponse = _mapper.Map<UserResponse>(userCreated);
+                    CreateUserResponse userResponse = _mapper.Map<CreateUserResponse>(userCreated);
 
                     return Ok(new { Success = true, User = userResponse });
                 }
@@ -145,6 +143,42 @@ namespace WebLuto.Controllers
             }
         }
 
+        [HttpPut]
+        [Route("UpdateUser/{id}")]
+        public async Task<ActionResult<dynamic>> UpdateUser([FromBody] CreateUserRequest userRequest, long id)
+        {
+            try
+            {
+                User userExists = await _userService.GetUserById(id);
+
+                if (userExists == null)
+                    return NotFound(new { Success = false, Message = $"Não foi encontrado nenhum usuário com o Id: {id}" });
+
+                if (!string.IsNullOrEmpty(userRequest.Password))
+                {
+                    User userByUsername = await _userService.GetUserByUsername(userRequest.Username);
+
+                    if (userByUsername != null)
+                        return Conflict(new { Success = false, Message = $"Já existe um usuário com o username: {userRequest.Username}" });
+                }
+
+                User userToUpdated = _mapper.Map<User>(userRequest);
+
+                User userUpdated = await _userService.UpdateUser(userToUpdated, id);
+
+                UpdateUserResponse userResponse = _mapper.Map<UpdateUserResponse>(userUpdated);
+
+                return Ok(new { Success = true, User = userResponse });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Success = false, ex.Message, Exception = ex });
+            }
+        }
+
+        #region Authentication Examples
+
+        /*
         [HttpGet]
         [Route("Anonymous")]
         [AllowAnonymous]
@@ -168,5 +202,8 @@ namespace WebLuto.Controllers
         [Route("Admin")]
         [Authorize(Roles = "0, 1")]
         public string Admin() => "Administrador";
+        */
+
+        #endregion
     }
 }

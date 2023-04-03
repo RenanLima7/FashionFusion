@@ -24,9 +24,9 @@ namespace WebLuto.Repositories
                     .Where(x => x.DeletionDate == null)
                     .ToListAsync();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                throw new Exception(string.Format("Erro ao buscar todos os usuários! \nErro - {0}", ex));
+                throw new Exception(string.Format("Erro ao buscar todos os usuários!"));
             }
         }
 
@@ -40,9 +40,9 @@ namespace WebLuto.Repositories
                     x.DeletionDate == null
                 );
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                throw new Exception(string.Format("Erro ao buscar um usuário com o Id: {0} \nErro - {1}", id, ex));
+                throw new Exception(string.Format("Erro ao buscar um usuário com o Id: {0}", id));
             }
         }
 
@@ -56,9 +56,9 @@ namespace WebLuto.Repositories
                     x.DeletionDate == null
                 );
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                throw new Exception(string.Format("Erro ao buscar um usuário com o Username: {0} \nErro - {1}", username, ex));
+                throw new Exception(string.Format("Erro ao buscar um usuário com o Username: {0}", username));
             }
         }
 
@@ -75,9 +75,9 @@ namespace WebLuto.Repositories
 
                 return user;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                throw new Exception(string.Format("Erro ao criar o usuário! \nErro - {0}", ex));
+                throw new Exception(string.Format("Erro ao criar o usuário!"));
             }
         }
 
@@ -90,9 +90,9 @@ namespace WebLuto.Repositories
                 if (userExists == null)
                     throw new Exception("Não foi possível encontrar um usuário com o ID: " + id);
 
-                userExists.Username = user.Username;
-                userExists.Password = Sha512Cryptographer.Encrypt(user.Password, userExists.Salt);
-                userExists.Type = user.Type;
+                userExists.Username = user.Username ?? userExists.Username;
+                userExists.Password = user.Password != null ? Sha512Cryptographer.Encrypt(user.Password, userExists.Salt) : userExists.Password;
+                userExists.Type = user.Type != userExists.Type ? user.Type : userExists.Type;
                 userExists.UpdateDate = DateTime.Now;
 
                 _dbContext.User.Update(userExists);
@@ -100,9 +100,9 @@ namespace WebLuto.Repositories
 
                 return userExists;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                throw new Exception(string.Format("Erro ao atualizar o usuário: {0} \nErro - {1}", id, ex));
+                throw new Exception(string.Format("Erro ao atualizar o usuário: {0}", id));
             }
         }
 
@@ -124,9 +124,9 @@ namespace WebLuto.Repositories
 
                 return true;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                throw new Exception(string.Format("Erro ao deletar o usuário: {0} \nErro - {1}", id, ex));
+                throw new Exception(string.Format("Erro ao deletar o usuário: {0}", id));
             }
         }
     }

@@ -75,7 +75,7 @@ namespace WebLuto.Services
         {
             try
             {
-                User userUpdated = await _userRepository.GetUserById(id);
+                User userUpdated = await _userRepository.UpdateUser(user, id);
 
                 return userUpdated;
             }

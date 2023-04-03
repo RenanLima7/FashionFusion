@@ -4,7 +4,7 @@ using WebLuto.Models.Enums.UserEnum;
 
 namespace WebLuto.DataContract.Requests
 {
-    public sealed class UserRequest
+    public sealed class CreateUserRequest
     {
         [Required]
         public string Username { get; set; }
