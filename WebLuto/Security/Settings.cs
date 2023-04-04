@@ -1,7 +1,25 @@
 ﻿namespace WebLuto.Security
 {
-    public static class Settings
+    public class Settings
     {
-        public static string SecretKey = "5cde6f45-02c3-4e04-b40a-8313487e972a";
+        private readonly IConfiguration _configuration;
+
+        private readonly IConfigurationBuilder _configurationBuilder;
+
+        private readonly IConfigurationRoot _configurationRoot;
+
+        public Settings() {
+            _configurationBuilder = new ConfigurationBuilder().AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+            _configurationRoot = _configurationBuilder.Build();
+            _configuration = _configurationRoot;
+        }
+
+        public string SecretKey
+        {
+            get
+            {
+                return _configuration.GetValue<string>("SecretKey"); 
+            }
+        }
     }
 }

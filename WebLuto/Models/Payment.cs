@@ -2,7 +2,7 @@
 
 namespace WebLuto.Models
 {
-    public class Payment
+    public class Payment //: BaseEntity
     {
         public long Id { get; set; }
 
