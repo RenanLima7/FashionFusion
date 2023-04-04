@@ -1,6 +1,6 @@
 ﻿namespace WebLuto.Models
 {
-    public class Client
+    public class Client //: BaseEntity
     {
         public long Id { get; set; }
 
@@ -17,5 +17,7 @@
         public Address Address { get; set; }
 
         public DateTime? BirthDate { get; set; }
+
+        public string? ProfileImageUrl { get; set; }
     }
 }
