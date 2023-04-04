@@ -1,9 +1,9 @@
 ﻿using WebLuto.DataContract.Requests;
 using WebLuto.Models;
 
-namespace WebLuto.Services.Interfaces
+namespace WebLuto.Repositories.Interfaces
 {
-    public interface IUserService
+    public interface IUserRepository
     {
         Task<List<User>> GetAllUsers();
 
