@@ -1,5 +1,6 @@
-﻿using WebLuto.DAO;
-using WebLuto.Models;
+﻿using WebLuto.Models;
+using WebLuto.Repositories;
+using WebLuto.Repositories.Interfaces;
 using WebLuto.Services.Interfaces;
 
 namespace WebLuto.Services
@@ -7,31 +8,79 @@ namespace WebLuto.Services
     public class ProductService : IProductService
     {
 
-        private readonly ProductRepository _productRepository;
+        private readonly IProductRepository _productRepository;
 
-        public ProductService(ProductRepository productRepository)
+        public ProductService(IProductRepository productRepository)
         {
             _productRepository = productRepository;
         }
 
-        public Task CreateProduct(Product product)
+        public async Task<List<Product>> GetAllProducts()
         {
-            throw new NotImplementedException();
+            try
+            {
+                List<Product> productList = await _productRepository.GetAllProducts();
+
+                return productList;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
 
-        public Task DeleteProduct(Product product)
+        public async Task<Product> GetProductById(long id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                Product product = await _productRepository.GetProductById(id);
+
+                return product;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
 
-        public Task UpdateProduct(Product product)
+        public async Task<Product> CreateProduct(Product productToCreate)
         {
-            throw new NotImplementedException();
+            try
+            {
+                Product productCreated = await _productRepository.CreateProduct(productToCreate);
+
+                return productCreated;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
 
-        public Task<Product> GetProductById(long id)
+        public async Task<Product> UpdateProduct(Product productToUpdate, Product existingProduct)
         {
-            throw new NotImplementedException();
+            try
+            {
+                Product productUpdated = await _productRepository.UpdateProduct(productToUpdate, existingProduct);
+
+                return productUpdated;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<bool> DeleteProduct(Product productToDelete)
+        {
+            try
+            {
+                return await _productRepository.DeleteProduct(productToDelete);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
     }
 }

@@ -1,8 +1,8 @@
 ﻿using WebLuto.Models;
 
-namespace WebLuto.Services.Interfaces
+namespace WebLuto.Repositories.Interfaces
 {
-    public interface IProductService
+    public interface IProductRepository
     {
         Task<List<Product>> GetAllProducts();
 
@@ -12,6 +12,6 @@ namespace WebLuto.Services.Interfaces
 
         Task<Product> UpdateProduct(Product productToUpdate, Product existingProduct);
 
-        Task<bool> DeleteProduct(Product productToDelete);
+        Task<bool> DeleteProduct(Product product);
     }
 }

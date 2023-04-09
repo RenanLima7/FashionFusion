@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebLuto.Data;
 
@@ -11,9 +12,10 @@ using WebLuto.Data;
 namespace WebLuto.Migrations
 {
     [DbContext(typeof(WLDBContext))]
-    partial class WLDBContextModelSnapshot : ModelSnapshot
+    [Migration("20230409222103_UpdateDataBase")]
+    partial class UpdateDataBase
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

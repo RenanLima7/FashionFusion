@@ -2,9 +2,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using System.Collections.Generic;
-using System.Numerics;
-using System.Runtime.ConstrainedExecution;
 using System.Text;
 using WebLuto.Data;
 using WebLuto.Repositories;
@@ -30,26 +27,26 @@ namespace WebLuto
 
             #endregion
 
-            #region Swageer
+            #region Swagger
 
             builder.Services.AddSwaggerGen(s =>
             {
                 s.SwaggerDoc("v1", new OpenApiInfo
-                    {
-                        Title = "Web Luto API",
-                        Version = "v1",
-                        Description = "Web Luto API"
-                    });
+                {
+                    Title = "Web Luto API",
+                    Version = "v1",
+                    Description = "Web Luto API"
+                });
 
                 s.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-                    {
-                        In = ParameterLocation.Header,
-                        Description = "Please insert token",
-                        Name = "Authorization",
-                        Type = SecuritySchemeType.Http,
-                        BearerFormat = "JWT",
-                        Scheme = "bearer"
-                    });
+                {
+                    In = ParameterLocation.Header,
+                    Description = "Please insert token",
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.Http,
+                    BearerFormat = "JWT",
+                    Scheme = "bearer"
+                });
 
                 s.AddSecurityRequirement(new OpenApiSecurityRequirement
                     {{
@@ -71,17 +68,17 @@ namespace WebLuto
 
             builder.Services.AddScoped<IUserRepository, UserRepository>();
             builder.Services.AddScoped<IUserService, UserService>();
+
+            builder.Services.AddScoped<IProductRepository, ProductRepository>();
+            builder.Services.AddScoped<IProductService, ProductService>();
+
             builder.Services.AddScoped<ITokenService, TokenService>();
 
             #endregion
-
-            #region Secret Key
+                        
+            #region JWT Authorization
 
             byte[] secretKey = Encoding.ASCII.GetBytes(new Settings().SecretKey);
-
-            #endregion
-
-            #region JWT Authorization
 
             builder.Services.AddAuthentication(x =>
                 {
