@@ -12,7 +12,7 @@ namespace WebLuto.Data
         }
 
         public DbSet<User> User { get; set; }
-        //public DbSet<Product> Product { get; set; }
+        public DbSet<Product> Product { get; set; }
         //public DbSet<Client> Client { get; set; }
         //public DbSet<Payment> Payment { get; set; }
         //public DbSet<Sale> Sale { get; set; }
@@ -21,7 +21,7 @@ namespace WebLuto.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfiguration(new UserMap());
-            //modelBuilder.ApplyConfiguration(new ProductMap());
+            modelBuilder.ApplyConfiguration(new ProductMap());
             //modelBuilder.ApplyConfiguration(new ClientMap());
             //modelBuilder.ApplyConfiguration(new PaymentMap());
             //modelBuilder.ApplyConfiguration(new SaleMap());
