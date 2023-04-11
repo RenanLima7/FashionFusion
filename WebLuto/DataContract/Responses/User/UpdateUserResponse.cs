@@ -1,4 +1,4 @@
-﻿using WebLuto.Models.Enums.UserEnum;
+﻿using WebLuto.Models.Enums;
 
 namespace WebLuto.DataContract.Responses
 {

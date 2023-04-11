@@ -5,7 +5,6 @@ using WebLuto.DataContract.Requests;
 using WebLuto.DataContract.Responses;
 using WebLuto.Models;
 using WebLuto.Security;
-using WebLuto.Services;
 using WebLuto.Services.Interfaces;
 
 namespace WebLuto.Controllers
@@ -119,7 +118,7 @@ namespace WebLuto.Controllers
 
         [HttpPost]
         [Route("CreateUser")]
-        [AllowAnonymous] // Temp
+        [Authorize] 
         public async Task<ActionResult<dynamic>> CreateUser([FromBody] CreateUserRequest userRequest)
         {
             try

@@ -1,4 +1,4 @@
-﻿using WebLuto.Models.Enums.ProductEnum;
+﻿using WebLuto.Models.Enums;
 
 namespace WebLuto.Models
 {

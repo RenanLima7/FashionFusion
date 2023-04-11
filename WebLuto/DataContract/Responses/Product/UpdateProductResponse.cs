@@ -1,9 +1,11 @@
 ﻿using WebLuto.Models.Enums;
 
-namespace WebLuto.Models
+namespace WebLuto.DataContract.Responses
 {
-    public class Product : BaseEntity
+    public sealed class UpdateProductResponse
     {
+        public long Id { get; set; }
+
         public string Name { get; set; }
 
         public decimal Price { get; set; }
@@ -15,5 +17,7 @@ namespace WebLuto.Models
         public string? Dimension { get; set; }
 
         public string? Image { get; set; }
+
+        public DateTime UpdateDate { get; set; }
     }
 }

@@ -11,10 +11,10 @@ namespace WebLuto.Services.Interfaces
 
         Task<User> GetUserByUsername(string username);
 
-        Task<User> CreateUser(User user);
+        Task<User> CreateUser(User userToCreate);
 
         Task<User> UpdateUser(User userToUpdate, User existingUser);
 
-        Task<bool> DeleteUser(User user);
+        Task<bool> DeleteUser(User userToDelete);
     }
 }

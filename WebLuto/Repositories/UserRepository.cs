@@ -105,7 +105,7 @@ namespace WebLuto.Repositories
         {
             try
             {
-                //_dbContext.User.Remove(userExists);
+                //_dbContext.User.Remove(userToDelete);
 
                 userToDelete.DeletionDate = DateTime.Now;
 
