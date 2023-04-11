@@ -1,4 +1,5 @@
 ﻿using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json.Linq;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -24,10 +25,9 @@ namespace WebLuto.Services
                 {
                     Subject = new ClaimsIdentity(new Claim[]
                     {
-                        new Claim(ClaimTypes.Name, user.Username.ToString()),
-                        new Claim(ClaimTypes.Role, user.Type.ToString())
+                        new Claim(ClaimTypes.Name, user.Username.ToString())
                     }),
-                    Expires = DateTime.UtcNow.AddHours(2),
+                    Expires = DateTime.UtcNow.AddDays(7),
                     SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(secretKey), SecurityAlgorithms.HmacSha256)
                 };
 
@@ -43,13 +43,41 @@ namespace WebLuto.Services
 
         public void IsValidToken(string authorizationHeader)
         {
-            if (string.IsNullOrEmpty(authorizationHeader) || !authorizationHeader.StartsWith("Bearer "))
-                throw new Exception("Token de autorização inválido");
+            try
+            {
+                if (string.IsNullOrEmpty(authorizationHeader))
+                    throw new SecurityTokenInvalidSignatureException();
 
-            string token = authorizationHeader.Substring("Bearer ".Length).Trim();
+                if (!authorizationHeader.StartsWith("Bearer "))
+                    throw new SecurityTokenInvalidSigningKeyException();
 
-            if (IsExpiredToken(token))
-                throw new Exception("Token de autorização expirado!");
+                string token = authorizationHeader.Substring("Bearer ".Length).Trim();
+
+                if (IsExpiredToken(token))
+                    throw new SecurityTokenExpiredException();
+            }
+            catch (Exception ex)
+            {
+                string message;
+
+                switch (ex)
+                {
+                    case SecurityTokenInvalidSignatureException:
+                        message = "O token de autorização é inválido.";
+                        break;
+                    case SecurityTokenInvalidSigningKeyException:
+                        message = "O token de autorização deve conter o prefixo \"Bearer \".";
+                        break;
+                    case SecurityTokenExpiredException:
+                        message = "O token de autorização expirou.";
+                        break;
+                    default:
+                        message = "Ocorreu um erro ao processar a solicitação.";
+                        break;
+                }
+
+                throw new Exception(message);
+            }
         }
 
         public bool IsExpiredToken(string token)
@@ -61,9 +89,9 @@ namespace WebLuto.Services
 
                 return jwtToken.ValidTo < DateTime.UtcNow;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                throw new Exception($"Erro ao verificar a validade do token! \nErro - {ex}");
+                throw new SecurityTokenInvalidSignatureException();
             }
         }
     }

@@ -67,7 +67,7 @@ namespace WebLuto.Repositories
             try
             {
                 userToCreate.CreationDate = DateTime.Now;
-                userToCreate.Salt = UtilityMethods.GenerateSaltAsLong();
+                userToCreate.Salt = UtilityMethods.GenerateSalt();
                 userToCreate.Password = Sha512Cryptographer.Encrypt(userToCreate.Password, userToCreate.Salt);
 
                 await _dbContext.User.AddAsync(userToCreate);
@@ -87,7 +87,6 @@ namespace WebLuto.Repositories
             {                
                 existingUser.Username = userToUpdate.Username ?? existingUser.Username;
                 existingUser.Password = userToUpdate.Password != null ? Sha512Cryptographer.Encrypt(userToUpdate.Password, existingUser.Salt) : existingUser.Password;
-                existingUser.Type = userToUpdate.Type != existingUser.Type ? userToUpdate.Type : existingUser.Type;
                 existingUser.UpdateDate = DateTime.Now;
 
                 _dbContext.User.Update(existingUser);

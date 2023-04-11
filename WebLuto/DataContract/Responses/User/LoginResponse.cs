@@ -7,7 +7,5 @@ namespace WebLuto.DataContract.Responses
         public long Id { get; set; }
 
         public string Username { get; set; }
-
-        public UserType Type { get; set; }
     }
 }

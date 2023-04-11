@@ -11,7 +11,5 @@ namespace WebLuto.DataContract.Requests
 
         [MinLength(8), PasswordPropertyText]
         public string? Password { get; set; }
-
-        public UserType? Type { get; set; }
     }
 }

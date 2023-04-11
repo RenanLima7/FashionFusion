@@ -11,7 +11,7 @@ namespace WebLuto.Data.Mapper
             builder.HasKey(x => x.Id);
             builder.Property(x => x.Username).IsRequired().HasMaxLength(250);
             builder.Property(x => x.Password).IsRequired();
-            builder.Property(x => x.Type).IsRequired();
+            builder.Property(x => x.Email).IsRequired();
         }
     }
 }

@@ -17,17 +17,13 @@ namespace WebLuto.Mapper
         {
             CreateMap<User, LoginResponse>();
 
-            CreateMap<CreateUserRequest, User>()
-                .ForMember(x => x.Type, options => options.MapFrom(y => y.Type));
+            CreateMap<CreateUserRequest, User>();
 
-            CreateMap<User, CreateUserResponse>()
-                .ForMember(x => x.Type, options => options.MapFrom(y => y.Type));
+            CreateMap<User, CreateUserResponse>();
 
-            CreateMap<UpdateUserRequest, User>()
-                .ForMember(x => x.Type, options => options.MapFrom(y => y.Type));
+            CreateMap<UpdateUserRequest, User>();
 
-            CreateMap<User, UpdateUserResponse>()
-                .ForMember(x => x.Type, options => options.MapFrom(y => y.Type));
+            CreateMap<User, UpdateUserResponse>();
         }
 
         public void ProductMap()
