@@ -9,9 +9,8 @@ using WebLuto.Services.Interfaces;
 
 namespace WebLuto.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("admin/api/[controller]")]
     [ApiController]
-    [Authorize]
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
@@ -44,13 +43,13 @@ namespace WebLuto.Controllers
                 User user = await _userService.GetUserByUsername(loginRequest.Username);
 
                 if (user == null)
-                    return NotFound(new { Success = false, Message = $"Não foi encontrado nenhum usuário com o username: {loginRequest.Username}" });
+                    return NotFound(new { Success = false, Message = $"Não foi encontrado nenhum usuário" });
 
                 bool isValidPassword = Sha512Cryptographer.Compare(loginRequest.Password, user.Salt, user.Password);
 
                 if (isValidPassword)
                 {
-                    string jwtToken = _tokenService.GenerateToken(user);
+                    string jwtToken = _tokenService.GenerateToken(user.Username, user.Email, user.Id);
 
                     LoginResponse loginResponse = _mapper.Map<LoginResponse>(user);
 
@@ -67,6 +66,7 @@ namespace WebLuto.Controllers
 
         [HttpGet]
         [Route("GetUserById")]
+        [WLToken]
         public async Task<ActionResult<dynamic>> GetUserById([FromQuery] long userId)
         {
             try
@@ -90,6 +90,7 @@ namespace WebLuto.Controllers
 
         [HttpGet]
         [Route("GetAllUsers")]
+        [WLToken]
         public async Task<ActionResult<dynamic>> GetAllUsers()
         {
             try
@@ -118,7 +119,7 @@ namespace WebLuto.Controllers
 
         [HttpPost]
         [Route("CreateUser")]
-        [Authorize] 
+        [WLToken]
         public async Task<ActionResult<dynamic>> CreateUser([FromBody] CreateUserRequest userRequest)
         {
             try
@@ -133,9 +134,11 @@ namespace WebLuto.Controllers
 
                     User userCreated = await _userService.CreateUser(user);
 
+                    string jwtToken = _tokenService.GenerateToken(userCreated.Username, user.Email, userCreated.Id);
+
                     CreateUserResponse userResponse = _mapper.Map<CreateUserResponse>(userCreated);
 
-                    return Ok(new { Success = true, User = userResponse });
+                    return Ok(new { Success = true, User = userResponse, Token = jwtToken });
                 }
             }
             catch (Exception ex)
@@ -146,6 +149,7 @@ namespace WebLuto.Controllers
 
         [HttpPut]
         [Route("UpdateUser/{id}")]
+        [WLToken]
         public async Task<ActionResult<dynamic>> UpdateUser([FromBody] UpdateUserRequest userRequest, long id)
         {
             try
@@ -180,6 +184,7 @@ namespace WebLuto.Controllers
 
         [HttpDelete]
         [Route("DeleteUser/{id}")]
+        [WLToken]
         public async Task<ActionResult<dynamic>> DeleteUser(long id)
         {
             try
@@ -201,35 +206,5 @@ namespace WebLuto.Controllers
                 return BadRequest(new { Success = false, ex.Message });
             }
         }
-
-        #region Authentication Examples
-
-        /*
-        [HttpGet]
-        [Route("Anonymous")]
-        [AllowAnonymous]
-        public string Anonymous() => "Anônimo";
-
-        [HttpGet]
-        [Route("Authenticated")]
-        public string Authenticated() => string.Format("Autenticado - {0}", User.Identity.Name);
-
-        [HttpGet]
-        [Route("Client")]
-        [Authorize(Roles = "0, 1, 2")]
-        public string Client() => "Cliente";
-
-        [HttpGet]
-        [Route("Employee")]
-        [Authorize(Roles = "0, 1")]
-        public string Employee() => "Funcionário";
-
-        [HttpGet]
-        [Route("Admin")]
-        [Authorize(Roles = "0, 1")]
-        public string Admin() => "Administrador";
-        */
-
-        #endregion
     }
 }

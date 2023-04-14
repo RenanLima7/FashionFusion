@@ -11,23 +11,21 @@ namespace WebLuto.Mapper
         {
             UserMap();
             ProductMap();
+            ClientMap();
+            AddressMap();
         }
 
         public void UserMap()
         {
             CreateMap<User, LoginResponse>();
 
-            CreateMap<CreateUserRequest, User>()
-                .ForMember(x => x.Type, options => options.MapFrom(y => y.Type));
+            CreateMap<CreateUserRequest, User>();
 
-            CreateMap<User, CreateUserResponse>()
-                .ForMember(x => x.Type, options => options.MapFrom(y => y.Type));
+            CreateMap<User, CreateUserResponse>();
 
-            CreateMap<UpdateUserRequest, User>()
-                .ForMember(x => x.Type, options => options.MapFrom(y => y.Type));
+            CreateMap<UpdateUserRequest, User>();
 
-            CreateMap<User, UpdateUserResponse>()
-                .ForMember(x => x.Type, options => options.MapFrom(y => y.Type));
+            CreateMap<User, UpdateUserResponse>();
         }
 
         public void ProductMap()
@@ -43,6 +41,32 @@ namespace WebLuto.Mapper
 
             CreateMap<Product, UpdateProductResponse>()
                 .ForMember(x => x.Type, options => options.MapFrom(y => y.Type));
+        }
+
+        public void ClientMap()
+        {
+            CreateMap<Client, LoginResponse>();
+
+            CreateMap<Client, LoginClientResponse>();
+
+            CreateMap<CreateClientRequest, Client>();
+
+            CreateMap<Client, CreateClientResponse>();
+
+            CreateMap<UpdateClientRequest, Client>();
+
+            CreateMap<Client, UpdateClientResponse>();
+        }
+
+        private void AddressMap()
+        {
+            CreateMap<CreateAddressRequest, Address>();
+
+            CreateMap<Address, CreateAddressResponse>();
+
+            CreateMap<UpdateAddressRequest, Address>();
+
+            CreateMap<Address, UpdateAddressResponse>();
         }
     }
 }

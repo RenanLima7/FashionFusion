@@ -1,22 +1,22 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using WebLuto.Models;
 
-namespace WebLuto.Models
+namespace WebLuto.DataContract.Responses
 {
-    public class Client : BaseEntity
+    public class LoginClientResponse
     {
-        public string Username { get; set; }
+        public long Id { get; set; }
 
         public string Email { get; set; }
 
-        public string Password { get; set; }
-
-        public int Salt { get; set; }
+        public string Username { get; set; }
 
         public string FirstName { get; set; }
 
         public string LastName { get; set; }
 
         public string CPF { get; set; }
+
+        public CreateAddressResponse Address { get; set; }
 
         public string? Phone { get; set; }
 
