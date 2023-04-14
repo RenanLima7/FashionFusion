@@ -11,6 +11,7 @@ namespace WebLuto.Mapper
         {
             UserMap();
             ProductMap();
+            ClientMap();
         }
 
         public void UserMap()
@@ -39,6 +40,19 @@ namespace WebLuto.Mapper
 
             CreateMap<Product, UpdateProductResponse>()
                 .ForMember(x => x.Type, options => options.MapFrom(y => y.Type));
+        }
+
+        public void ClientMap()
+        {
+            CreateMap<Client, LoginResponse>();
+
+            CreateMap<CreateClientRequest, Client>();
+
+            CreateMap<Client, CreateClientResponse>();
+
+            CreateMap<UpdateClientRequest, Client>();
+
+            CreateMap<Client, UpdateClientResponse>();
         }
     }
 }

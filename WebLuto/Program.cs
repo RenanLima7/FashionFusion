@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
-using WebLuto.Data;
+using WebLuto.DataContext;
 using WebLuto.Repositories;
 using WebLuto.Repositories.Interfaces;
 using WebLuto.Security;

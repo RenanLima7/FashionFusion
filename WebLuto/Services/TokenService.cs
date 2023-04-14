@@ -1,5 +1,4 @@
 ﻿using Microsoft.IdentityModel.Tokens;
-using Newtonsoft.Json.Linq;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -25,7 +24,9 @@ namespace WebLuto.Services
                 {
                     Subject = new ClaimsIdentity(new Claim[]
                     {
-                        new Claim(ClaimTypes.Name, user.Username.ToString())
+                        new Claim(ClaimTypes.Name, user.Username.ToString()),
+                        new Claim(ClaimTypes.Email, user.Email.ToString()),
+                        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                     }),
                     Expires = DateTime.UtcNow.AddDays(7),
                     SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(secretKey), SecurityAlgorithms.HmacSha256)
@@ -37,7 +38,7 @@ namespace WebLuto.Services
             }
             catch (Exception ex)
             {
-                throw new Exception($"Houve um erro ao gerar o token! \nErro - {ex}");
+                throw new Exception($"Houve um erro ao gerar o token - {ex}");
             }
         }
 

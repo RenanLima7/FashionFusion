@@ -15,6 +15,9 @@ namespace WebLuto.Data.Mapper
             builder.Property(x => x.Quantity).IsRequired();
             builder.Property(x => x.Dimension).HasMaxLength(15);
             builder.Property(x => x.Image);
+            builder.Property(x => x.CreationDate).IsRequired();
+            builder.Property(x => x.UpdateDate);
+            builder.Property(x => x.DeletionDate);
         }
     }
 }
