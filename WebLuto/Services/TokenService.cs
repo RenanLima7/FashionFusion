@@ -12,7 +12,7 @@ namespace WebLuto.Services
     {
         public TokenService() { }
 
-        public string GenerateToken(User user)
+        public string GenerateToken(string username, string email, long id)
         {
             try
             {
@@ -24,9 +24,9 @@ namespace WebLuto.Services
                 {
                     Subject = new ClaimsIdentity(new Claim[]
                     {
-                        new Claim(ClaimTypes.Name, user.Username.ToString()),
-                        new Claim(ClaimTypes.Email, user.Email.ToString()),
-                        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                        new Claim(ClaimTypes.Name, username.ToString()),
+                        new Claim(ClaimTypes.Email, email.ToString()),
+                        new Claim("UserId", id.ToString()),
                     }),
                     Expires = DateTime.UtcNow.AddDays(7),
                     SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(secretKey), SecurityAlgorithms.HmacSha256)

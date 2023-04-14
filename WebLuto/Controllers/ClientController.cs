@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
 using WebLuto.DataContract.Requests;
 using WebLuto.DataContract.Responses;
 using WebLuto.Models;
@@ -17,12 +18,15 @@ namespace WebLuto.Controllers
 
         private readonly IMapper _mapper;
 
+        private readonly IAddressService _addressService;
+
         private readonly ITokenService _tokenService;
 
-        public ClientController(IClientService clientService, IMapper mapper, ITokenService tokenService)
+        public ClientController(IClientService clientService, IMapper mapper, IAddressService addressService, ITokenService tokenService)
         {
             _clientService = clientService;
             _mapper = mapper;
+            _addressService = addressService;
             _tokenService = tokenService;
         }
 
@@ -42,9 +46,13 @@ namespace WebLuto.Controllers
 
                 if (isValidPassword)
                 {
-                    string jwtToken = _tokenService.GenerateToken(client);
+                    string jwtToken = _tokenService.GenerateToken(client.Username, client.Email, client.Id);
 
-                    LoginResponse loginResponse = _mapper.Map<LoginResponse>(client);
+                    Address address = await _addressService.GetAddressByClientId(client.Id);
+                    CreateAddressResponse addressResponse = _mapper.Map<CreateAddressResponse>(address);
+
+                    LoginClientResponse loginResponse = _mapper.Map<LoginClientResponse>(client);
+                    loginResponse.Address = addressResponse;
 
                     return Ok(new { Success = true, Client = loginResponse, Token = jwtToken });
                 }
@@ -57,8 +65,6 @@ namespace WebLuto.Controllers
             }
         }
 
-        #region Verificar necessidade do UserId
-        /*
         [HttpGet]
         [Route("GetClientById")]
         [WLToken]
@@ -69,10 +75,14 @@ namespace WebLuto.Controllers
                 Client client = await _clientService.GetClientByEmailOrUsername(User.Identity.Name);
 
                 if (client == null)
-                    return NotFound(new { Success = false, Message = $"Não foi encontrado nenhum cliente com o Id: {clientId}" });
+                    return NotFound(new { Success = false, Message = $"Não foi encontrado nenhum cliente!" });
                 else
                 {
+                    Address address = await _addressService.GetAddressByClientId(client.Id);
+                    CreateAddressResponse addressResponse = _mapper.Map<CreateAddressResponse>(address);
+
                     CreateClientResponse clientResponse = _mapper.Map<CreateClientResponse>(client);
+                    clientResponse.Address = addressResponse;
 
                     return Ok(new { Success = true, Client = clientResponse });
                 }
@@ -100,7 +110,13 @@ namespace WebLuto.Controllers
 
                     foreach (Client client in clientList)
                     {
-                        clientResponseList.Add(_mapper.Map<CreateClientResponse>(client));
+                        Address address = await _addressService.GetAddressByClientId(client.Id);
+                        CreateAddressResponse addressResponse = _mapper.Map<CreateAddressResponse>(address);
+
+                        CreateClientResponse clientResponse = _mapper.Map<CreateClientResponse>(client);
+                        clientResponse.Address = addressResponse;
+
+                        clientResponseList.Add(clientResponse);
                     }
 
                     return Ok(new { Success = true, ClientList = clientResponseList });
@@ -111,12 +127,9 @@ namespace WebLuto.Controllers
                 return BadRequest(new { Success = false, ex.Message });
             }
         }
-        */
-        #endregion
 
         [HttpPost]
         [Route("CreateClient")]
-        [WLToken]
         public async Task<ActionResult<dynamic>> CreateClient([FromBody] CreateClientRequest clientRequest)
         {
             try
@@ -124,12 +137,17 @@ namespace WebLuto.Controllers
                 _clientService.ExistsClientWithUsernameOrEmail(clientRequest.Username, clientRequest.Email);
 
                 Client client = _mapper.Map<Client>(clientRequest);
-
                 Client clientCreated = await _clientService.CreateClient(client);
 
-                string jwtToken = _tokenService.GenerateToken(clientCreated);
+                Address address = _mapper.Map<Address>(clientRequest.Address);
+                address.ClientId = clientCreated.Id;
+                Address addressCreated = await _addressService.CreateAddress(address);
+
+                string jwtToken = _tokenService.GenerateToken(clientCreated.Username, clientCreated.Email, clientCreated.Id);
 
                 CreateClientResponse clientResponse = _mapper.Map<CreateClientResponse>(clientCreated);
+                CreateAddressResponse addressResponse = _mapper.Map<CreateAddressResponse>(addressCreated);
+                clientResponse.Address = addressResponse;
 
                 return Ok(new { Success = true, Client = clientResponse, Token = jwtToken });
             }
@@ -146,6 +164,7 @@ namespace WebLuto.Controllers
         {
             try
             {
+                // Refresh Token
                 Client existingClient = await _clientService.GetClientByEmailOrUsername(User.Identity.Name);
 
                 if (existingClient == null)
@@ -155,10 +174,20 @@ namespace WebLuto.Controllers
                     _clientService.ExistsClientWithUsernameOrEmail(clientRequest.Username, clientRequest.Email);
 
                 Client clientToUpdated = _mapper.Map<Client>(clientRequest);
-
                 Client clientUpdated = await _clientService.UpdateClient(clientToUpdated, existingClient);
 
+                Address existingAddress = await _addressService.GetAddressByClientId(existingClient.Id);
+
+                if (clientRequest.Address != null)
+                {
+                    Address addressToUpdated = _mapper.Map<Address>(clientRequest.Address);
+                    existingAddress = await _addressService.UpdateAddress(addressToUpdated, existingAddress);
+                }
+
+                UpdateAddressResponse addressResponse = _mapper.Map<UpdateAddressResponse>(existingAddress);
+
                 UpdateClientResponse clientResponse = _mapper.Map<UpdateClientResponse>(clientUpdated);
+                clientResponse.Address = addressResponse;                
 
                 return Ok(new { Success = true, Client = clientResponse });
             }
@@ -183,9 +212,14 @@ namespace WebLuto.Controllers
                 bool successDeletedClient = await _clientService.DeleteClient(existingClient);
 
                 if (successDeletedClient)
-                    return Ok(new { Success = true, Client = $"Cliente {existingClient.Username} excluído com sucesso!" });
+                {
+                    Address address = await _addressService.GetAddressByClientId(existingClient.Id);
+                    _addressService.DeleteAddress(address);
+
+                    return Ok(new { Success = true, Message = $"Cliente {existingClient.Username} excluído com sucesso!" });
+                }
                 else
-                    return BadRequest(new { Success = false, Client = $"Erro ao excluir o cliente {existingClient.Username}!" });
+                    return BadRequest(new { Success = false, Message = $"Erro ao excluir o cliente {existingClient.Username}!" });
             }
             catch (Exception ex)
             {

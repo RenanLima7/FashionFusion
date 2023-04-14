@@ -18,14 +18,7 @@ namespace WebLuto
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            #region Services
-
-            builder.Services.AddAutoMapper(typeof(Mapper.Mapper));
-            builder.Services.AddControllers();
-            builder.Services.AddCors();
-            builder.Services.AddEndpointsApiExplorer();
-
-            #endregion
+            ConfigureServices(builder);
 
             #region Swagger
 
@@ -64,18 +57,8 @@ namespace WebLuto
 
             #endregion
 
-            #region Scopes
+            ConfigureServicesScopes(builder);
 
-            builder.Services.AddScoped<IUserRepository, UserRepository>();
-            builder.Services.AddScoped<IUserService, UserService>();
-
-            builder.Services.AddScoped<IProductRepository, ProductRepository>();
-            builder.Services.AddScoped<IProductService, ProductService>();
-
-            builder.Services.AddScoped<ITokenService, TokenService>();
-
-            #endregion
-                        
             #region JWT Authorization
 
             byte[] secretKey = Encoding.ASCII.GetBytes(new Settings().SecretKey);
@@ -131,6 +114,31 @@ namespace WebLuto
             app.MapControllers();
 
             app.Run();
+        }
+
+        private static void ConfigureServices(WebApplicationBuilder builder)
+        {
+            builder.Services.AddAutoMapper(typeof(Mapper.Mapper));
+            builder.Services.AddControllers();
+            builder.Services.AddCors();
+            builder.Services.AddEndpointsApiExplorer();
+        }
+
+        private static void ConfigureServicesScopes(WebApplicationBuilder builder)
+        {
+            builder.Services.AddScoped<IUserRepository, UserRepository>();
+            builder.Services.AddScoped<IUserService, UserService>();
+
+            builder.Services.AddScoped<IProductRepository, ProductRepository>();
+            builder.Services.AddScoped<IProductService, ProductService>();
+
+            builder.Services.AddScoped<IClientRepository, ClientRepository>();
+            builder.Services.AddScoped<IClientService, ClientService>();
+
+            builder.Services.AddScoped<IAddressRepository, AddressRepository>();
+            builder.Services.AddScoped<IAddressService, AddressService>();
+
+            builder.Services.AddScoped<ITokenService, TokenService>();
         }
     }
 }

@@ -9,6 +9,7 @@ namespace WebLuto.Data.Mapper
         public void Configure(EntityTypeBuilder<Address> builder)
         {
             builder.HasKey(x => x.Id);
+            builder.Property(x => x.ClientId).IsRequired();
             builder.Property(x => x.ZipCode).IsRequired().HasMaxLength(10);
             builder.Property(x => x.AddressLine).IsRequired().HasMaxLength(250);
             builder.Property(x => x.AddressLineNumber).IsRequired().HasMaxLength(7);

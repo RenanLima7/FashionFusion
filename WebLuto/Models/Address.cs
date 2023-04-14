@@ -1,7 +1,13 @@
-﻿namespace WebLuto.Models
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace WebLuto.Models
 {
     public class Address : BaseEntity
     {
+        [ForeignKey("Client")]
+        public long ClientId { get; set; }
+        public virtual Client Client { get; set; }
+
         public string ZipCode { get; set; }
 
         public string AddressLine { get; set; }

@@ -49,7 +49,7 @@ namespace WebLuto.Controllers
 
                 if (isValidPassword)
                 {
-                    string jwtToken = _tokenService.GenerateToken(user);
+                    string jwtToken = _tokenService.GenerateToken(user.Username, user.Email, user.Id);
 
                     LoginResponse loginResponse = _mapper.Map<LoginResponse>(user);
 
@@ -134,7 +134,7 @@ namespace WebLuto.Controllers
 
                     User userCreated = await _userService.CreateUser(user);
 
-                    string jwtToken = _tokenService.GenerateToken(userCreated);
+                    string jwtToken = _tokenService.GenerateToken(userCreated.Username, user.Email, userCreated.Id);
 
                     CreateUserResponse userResponse = _mapper.Map<CreateUserResponse>(userCreated);
 

@@ -25,7 +25,7 @@ namespace WebLuto.DataContract.Requests
         public string CPF { get; set; }
 
         [Required]
-        public Address Address { get; set; }
+        public CreateAddressRequest Address { get; set; }
 
         [MaxLength(20)]
         public string? Phone { get; set; }

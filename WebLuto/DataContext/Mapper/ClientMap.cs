@@ -18,7 +18,6 @@ namespace WebLuto.Data.Mapper
             builder.Property(x => x.FirstName).IsRequired().HasMaxLength(25);
             builder.Property(x => x.LastName).IsRequired().HasMaxLength(25);
             builder.Property(x => x.CPF).IsRequired().HasMaxLength(15);
-            builder.Property(x => x.Address).IsRequired();
             builder.Property(x => x.Phone).HasMaxLength(20);
             builder.Property(x => x.BirthDate);
             builder.Property(x => x.Avatar);

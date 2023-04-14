@@ -4,6 +4,8 @@ namespace WebLuto.DataContract.Responses
 {
     public class UpdateClientResponse
     {
+        public long Id { get; set; }
+
         public string Email { get; set; }
 
         public string Username { get; set; }
@@ -14,7 +16,7 @@ namespace WebLuto.DataContract.Responses
 
         public string CPF { get; set; }
 
-        public Address Address { get; set; }
+        public UpdateAddressResponse Address { get; set; }
 
         public string? Phone { get; set; }
 

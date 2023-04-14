@@ -1,7 +1,10 @@
-﻿namespace WebLuto.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace WebLuto.Models
 {
-    public abstract class BaseEntity 
+    public abstract class BaseEntity
     {
+        [Key()]
         public long Id { get; set; }
 
         public DateTime CreationDate { get; set; }

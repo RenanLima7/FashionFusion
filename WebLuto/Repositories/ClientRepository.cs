@@ -74,7 +74,6 @@ namespace WebLuto.Repositories
                 clientToCreate.FirstName = clientToCreate.FirstName;
                 clientToCreate.LastName = clientToCreate.LastName;
                 clientToCreate.CPF = clientToCreate.CPF;
-                clientToCreate.Address = clientToCreate.Address;
                 clientToCreate.Phone = clientToCreate.Phone;
                 clientToCreate.BirthDate = clientToCreate.BirthDate;
                 clientToCreate.Avatar = clientToCreate.Avatar;
@@ -102,7 +101,6 @@ namespace WebLuto.Repositories
                 existingClient.FirstName = clientToUpdate.FirstName ?? existingClient.FirstName;
                 existingClient.LastName = clientToUpdate.LastName ?? existingClient.LastName;
                 existingClient.CPF = clientToUpdate.CPF ?? existingClient.CPF;
-                existingClient.Address = clientToUpdate.Address ?? existingClient.Address;
                 existingClient.Phone = clientToUpdate.Phone ?? existingClient.Phone;
                 existingClient.BirthDate = clientToUpdate.BirthDate ?? existingClient.BirthDate;
                 existingClient.Avatar = clientToUpdate.Avatar ?? existingClient.Avatar;

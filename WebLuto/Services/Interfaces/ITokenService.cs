@@ -4,7 +4,7 @@ namespace WebLuto.Services.Interfaces
 {
     public interface ITokenService
     {
-        string GenerateToken(User user);
+        string GenerateToken(string username, string email, long id);
 
         void IsValidToken(string authorizationHeader);
 

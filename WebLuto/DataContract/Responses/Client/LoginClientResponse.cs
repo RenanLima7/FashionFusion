@@ -2,7 +2,7 @@
 
 namespace WebLuto.DataContract.Responses
 {
-    public class CreateClientResponse
+    public class LoginClientResponse
     {
         public long Id { get; set; }
 
@@ -23,7 +23,5 @@ namespace WebLuto.DataContract.Responses
         public DateTime? BirthDate { get; set; }
 
         public string? Avatar { get; set; }
-
-        public DateTime CreationDate { get; set; }
     }
 }

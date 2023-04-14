@@ -12,6 +12,7 @@ namespace WebLuto.Mapper
             UserMap();
             ProductMap();
             ClientMap();
+            AddressMap();
         }
 
         public void UserMap()
@@ -46,6 +47,8 @@ namespace WebLuto.Mapper
         {
             CreateMap<Client, LoginResponse>();
 
+            CreateMap<Client, LoginClientResponse>();
+
             CreateMap<CreateClientRequest, Client>();
 
             CreateMap<Client, CreateClientResponse>();
@@ -53,6 +56,17 @@ namespace WebLuto.Mapper
             CreateMap<UpdateClientRequest, Client>();
 
             CreateMap<Client, UpdateClientResponse>();
+        }
+
+        private void AddressMap()
+        {
+            CreateMap<CreateAddressRequest, Address>();
+
+            CreateMap<Address, CreateAddressResponse>();
+
+            CreateMap<UpdateAddressRequest, Address>();
+
+            CreateMap<Address, UpdateAddressResponse>();
         }
     }
 }
