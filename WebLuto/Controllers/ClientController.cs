@@ -46,10 +46,14 @@ namespace WebLuto.Controllers
 
                 //_emailService.SendEmail(client, EmailTemplateType.Default);
                 var settings = new Settings();
-                string emailContact = settings.EmailContact;
-                string emailPassword = settings.EmailPassword;
 
-                return Ok( new { emailContact, emailPassword });
+                return Ok(new
+                {
+                    settings.EmailContact,
+                    settings.EmailPassword,
+                    settings.SecretKey,
+                    settings.EmailConfiguration
+                });
             }
             catch (Exception ex)
             {
