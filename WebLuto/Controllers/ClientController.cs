@@ -32,28 +32,25 @@ namespace WebLuto.Controllers
 
         [HttpGet]
         [Route("me")]
-        [AllowAnonymous]
+        [Authorize]
         public async Task<ActionResult<dynamic>> Me()
         {
             try
             {
-                Client client = new Client
-                {
-                    Email = "renanlima1510@gmail.com",
-                    FirstName = "Renan",
-                    LastName = "Lima"
-                };
+                Client client = await _clientService.GetClientByEmailOrUsername(User.Identity.Name);
 
-                //_emailService.SendEmail(client, EmailTemplateType.Default);
-                var settings = new Settings();
-
-                return Ok(new
+                if (client == null)
+                    return Unauthorized(new { Success = false, Message = $"Token inválido!" });
+                else
                 {
-                    settings.EmailContact,
-                    settings.EmailPassword,
-                    settings.SecretKey,
-                    settings.EmailConfiguration
-                });
+                    Address address = await _addressService.GetAddressByClientId(client.Id);
+                    CreateAddressResponse addressResponse = _mapper.Map<CreateAddressResponse>(address);
+
+                    LoginClientResponse loginResponse = _mapper.Map<LoginClientResponse>(client);
+                    loginResponse.Address = addressResponse;
+
+                    return Ok(new { Success = true, Client = loginResponse });
+                }
             }
             catch (Exception ex)
             {
@@ -230,13 +227,13 @@ namespace WebLuto.Controllers
                 CreateAddressResponse addressResponse = _mapper.Map<CreateAddressResponse>(addressCreated);
                 clientResponse.Address = addressResponse;
 
-                wLTransaction.Commit();
+                await wLTransaction.Commit();
 
                 return Ok(new { Success = true, Client = clientResponse });
             }
             catch (Exception ex)
             {
-                wLTransaction.Rollback();
+                await wLTransaction.Rollback();
                 return BadRequest(new { Success = false, ex.Message });
             }
         }
@@ -288,13 +285,13 @@ namespace WebLuto.Controllers
                 UpdateClientResponse clientResponse = _mapper.Map<UpdateClientResponse>(clientUpdated);
                 clientResponse.Address = addressResponse;
 
-                wLTransaction.Commit();
+                await wLTransaction.Commit();
 
                 return Ok(new { Success = true, Client = clientResponse });
             }
             catch (Exception ex)
             {
-                wLTransaction.Rollback();
+                await wLTransaction.Rollback();
                 return BadRequest(new { Success = false, ex.Message });
             }
         }
@@ -318,9 +315,9 @@ namespace WebLuto.Controllers
                 if (successDeletedClient)
                 {
                     Address address = await _addressService.GetAddressByClientId(existingClient.Id);
-                    _addressService.DeleteAddress(address);
+                    await _addressService.DeleteAddress(address);
 
-                    wLTransaction.Commit();
+                    await wLTransaction.Commit();
 
                     _emailService.SendEmail(existingClient, EmailTemplateType.AccountDeletion);
 
@@ -331,7 +328,7 @@ namespace WebLuto.Controllers
             }
             catch (Exception ex)
             {
-                wLTransaction.Rollback();
+                await wLTransaction.Rollback();
                 return BadRequest(new { Success = false, ex.Message });
             }
         }
