@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
-using System.Security.Cryptography;
-using System.Text;
+using System.ComponentModel;
+using System.Reflection;
 
 namespace WebLuto.Utils
 {
@@ -31,6 +31,12 @@ namespace WebLuto.Utils
         public static int GenerateSalt()
         {
             return new Random().Next(111111, 999999);
+        }
+
+        public static string GetEnumDescription(Enum value)
+        {
+            var field = value.GetType().GetField(value.ToString());
+            return field.GetCustomAttribute<DescriptionAttribute>()?.Description;
         }
     }
 }

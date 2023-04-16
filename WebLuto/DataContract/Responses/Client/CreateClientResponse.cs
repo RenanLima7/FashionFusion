@@ -1,6 +1,4 @@
-﻿using WebLuto.Models;
-
-namespace WebLuto.DataContract.Responses
+﻿namespace WebLuto.DataContract.Responses
 {
     public class CreateClientResponse
     {
@@ -9,6 +7,8 @@ namespace WebLuto.DataContract.Responses
         public string Email { get; set; }
 
         public string Username { get; set; }
+
+        public bool IsConfirmed { get; set; }
 
         public string FirstName { get; set; }
 

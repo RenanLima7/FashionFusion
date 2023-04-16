@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
+using WebLuto.Common;
 
 namespace WebLuto.Models
 {
@@ -11,6 +12,8 @@ namespace WebLuto.Models
         public string Password { get; set; }
 
         public int Salt { get; set; }
+
+        public bool IsConfirmed { get; set; }
 
         public string FirstName { get; set; }
 

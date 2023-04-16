@@ -1,15 +1,18 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using WebLuto.Data.Mapper;
 using WebLuto.Models;
+using WebLuto.Security;
 
 namespace WebLuto.DataContext
 {
-    public class WLDBContext : DbContext
+    public class WLContext : DbContext
     {
-        public WLDBContext(DbContextOptions<WLDBContext> options)
+        public WLContext(DbContextOptions<WLContext> options)
             : base(options)
-        {
-        }
+        { }
+
+        public WLContext() : base(GetDefaultOptions())
+        { }
 
         public DbSet<User> User { get; set; }
         public DbSet<Product> Product { get; set; }
@@ -24,6 +27,14 @@ namespace WebLuto.DataContext
             modelBuilder.ApplyConfiguration(new AddressMap());
 
             base.OnModelCreating(modelBuilder);
+        }
+
+        private static DbContextOptions<WLContext> GetDefaultOptions()
+        {
+            var builder = new DbContextOptionsBuilder<WLContext>();
+            builder.UseSqlServer(new Settings().DataBase);
+
+            return builder.Options;
         }
     }
 }

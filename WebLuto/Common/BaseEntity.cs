@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace WebLuto.Models
+namespace WebLuto.Common
 {
     public abstract class BaseEntity
     {

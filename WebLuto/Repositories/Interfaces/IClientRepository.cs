@@ -15,5 +15,7 @@ namespace WebLuto.Repositories.Interfaces
         Task<Client> UpdateClient(Client clientToUpdate, Client existingClient);
 
         Task<bool> DeleteClient(Client clientToDelete);
+
+        void UpdateIsConfirmed(Client client, bool isConfirmed);
     }
 }

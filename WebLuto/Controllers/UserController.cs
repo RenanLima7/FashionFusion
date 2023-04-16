@@ -11,6 +11,7 @@ namespace WebLuto.Controllers
 {
     [Route("admin/api/[controller]")]
     [ApiController]
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
@@ -49,11 +50,11 @@ namespace WebLuto.Controllers
 
                 if (isValidPassword)
                 {
-                    string jwtToken = _tokenService.GenerateToken(user.Username, user.Email, user.Id);
+                    //string jwtToken = _tokenService.GenerateToken(user.Username, user.Email, user.Id);
 
                     LoginResponse loginResponse = _mapper.Map<LoginResponse>(user);
 
-                    return Ok(new { Success = true, User = loginResponse, Token = jwtToken });
+                    return Ok(new { Success = true, User = loginResponse, Token = " " });
                 }
                 else
                     return BadRequest(new { Success = false, Message = "Usuário ou senha inválidos!" });
@@ -134,11 +135,11 @@ namespace WebLuto.Controllers
 
                     User userCreated = await _userService.CreateUser(user);
 
-                    string jwtToken = _tokenService.GenerateToken(userCreated.Username, user.Email, userCreated.Id);
+                    //string jwtToken = _tokenService.GenerateToken(userCreated.Username, user.Email, userCreated.Id);
 
                     CreateUserResponse userResponse = _mapper.Map<CreateUserResponse>(userCreated);
 
-                    return Ok(new { Success = true, User = userResponse, Token = jwtToken });
+                    return Ok(new { Success = true, User = userResponse, Token = " " });
                 }
             }
             catch (Exception ex)

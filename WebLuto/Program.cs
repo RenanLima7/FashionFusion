@@ -86,7 +86,7 @@ namespace WebLuto
             #region DataBase Connection
 
             builder.Services.AddEntityFrameworkSqlServer()
-                .AddDbContext<WLDBContext>(
+                .AddDbContext<WLContext>(
                     options => options.UseSqlServer(builder.Configuration.GetConnectionString("DataBase"))
                 );
 
@@ -139,6 +139,8 @@ namespace WebLuto
             builder.Services.AddScoped<IAddressService, AddressService>();
 
             builder.Services.AddScoped<ITokenService, TokenService>();
+
+            builder.Services.AddScoped<IEmailService, EmailService>();
         }
     }
 }

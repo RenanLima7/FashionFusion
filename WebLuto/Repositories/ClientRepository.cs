@@ -9,11 +9,11 @@ namespace WebLuto.Repositories
 {
     public class ClientRepository : IClientRepository
     {
-        private readonly WLDBContext _dbContext;
+        private readonly WLContext _dbContext;
 
-        public ClientRepository(WLDBContext wLDBContext)
+        public ClientRepository(WLContext wLContext)
         {
-            _dbContext = wLDBContext;
+            _dbContext = wLContext;
         }
 
         public async Task<List<Client>> GetAllClients()
@@ -58,7 +58,7 @@ namespace WebLuto.Repositories
             }
             catch (Exception)
             {
-                throw new Exception(string.Format("Erro ao buscar o cliente com o email/username: {0}", emailOrUsername));
+                throw new Exception(string.Format("Erro ao buscar o cliente: {0}", emailOrUsername));
             }
         }
 
@@ -78,6 +78,7 @@ namespace WebLuto.Repositories
                 clientToCreate.BirthDate = clientToCreate.BirthDate;
                 clientToCreate.Avatar = clientToCreate.Avatar;
                 clientToCreate.CreationDate = DateTime.Now;
+                clientToCreate.IsConfirmed = false;
 
                 await _dbContext.Client.AddAsync(clientToCreate);
                 await _dbContext.SaveChangesAsync();
@@ -131,6 +132,22 @@ namespace WebLuto.Repositories
             catch (Exception)
             {
                 throw new Exception(string.Format("Erro ao deletar o cliente: {0}", clientToDelete.Id));
+            }
+        }
+
+        public async void UpdateIsConfirmed(Client client, bool isConfirmed)
+        {
+            try
+            {
+                client.IsConfirmed = isConfirmed;
+                client.UpdateDate = DateTime.Now;
+
+                _dbContext.Client.Update(client);
+                await _dbContext.SaveChangesAsync();
+            }
+            catch (Exception)
+            {
+                throw new Exception(string.Format("Erro ao confirmar a conta do cliente: {0}", client.Id));
             }
         }
     }

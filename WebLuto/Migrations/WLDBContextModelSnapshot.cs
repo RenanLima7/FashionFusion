@@ -10,7 +10,7 @@ using WebLuto.DataContext;
 
 namespace WebLuto.Migrations
 {
-    [DbContext(typeof(WLDBContext))]
+    [DbContext(typeof(WLContext))]
     partial class WLDBContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
@@ -103,6 +103,9 @@ namespace WebLuto.Migrations
                         .IsRequired()
                         .HasMaxLength(25)
                         .HasColumnType("nvarchar(25)");
+
+                    b.Property<bool>("IsConfirmed")
+                        .HasColumnType("bit");
 
                     b.Property<string>("LastName")
                         .IsRequired()

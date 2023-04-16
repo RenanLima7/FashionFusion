@@ -1,4 +1,5 @@
-﻿using WebLuto.Models.Enums;
+﻿using WebLuto.Common;
+using WebLuto.Models.Enums;
 
 namespace WebLuto.Models
 {
