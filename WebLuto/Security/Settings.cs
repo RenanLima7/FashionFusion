@@ -53,14 +53,6 @@
             {
                 return _configuration.GetValue<string>("DefaultUrlApi");
             }
-        }  
-        
-        public string EmailConfiguration
-        {
-            get
-            {
-                return _configuration.GetValue<string>("EmailConfiguration");
-            }
-        }        
+        }               
     }
 }
