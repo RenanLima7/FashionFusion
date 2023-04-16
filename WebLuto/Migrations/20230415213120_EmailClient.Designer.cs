@@ -12,8 +12,8 @@ using WebLuto.DataContext;
 namespace WebLuto.Migrations
 {
     [DbContext(typeof(WLContext))]
-    [Migration("20230414052939_AddressClientUpdate")]
-    partial class AddressClientUpdate
+    [Migration("20230415213120_EmailClient")]
+    partial class EmailClient
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -105,6 +105,9 @@ namespace WebLuto.Migrations
                         .IsRequired()
                         .HasMaxLength(25)
                         .HasColumnType("nvarchar(25)");
+
+                    b.Property<bool>("IsConfirmed")
+                        .HasColumnType("bit");
 
                     b.Property<string>("LastName")
                         .IsRequired()

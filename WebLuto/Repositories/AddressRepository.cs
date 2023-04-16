@@ -9,11 +9,11 @@ namespace WebLuto.Repositories
 {
     public class AddressRepository : IAddressRepository
     {
-        private readonly WLDBContext _dbContext;
+        private readonly WLContext _dbContext;
 
-        public AddressRepository(WLDBContext wLDBContext)
+        public AddressRepository(WLContext wLContext)
         {
-            _dbContext = wLDBContext;
+            _dbContext = wLContext;
         }
 
         public async Task<Address> GetAddressById(long id)

@@ -17,5 +17,9 @@ namespace WebLuto.Services.Interfaces
         Task<bool> DeleteClient(Client clientToDelete);
 
         void ExistsClientWithUsernameOrEmail(string username, string email);
+
+        void UpdateIsConfirmed(Client client, bool isConfirmed);
+
+        bool VerifyIsConfirmed(Client client);
     }
 }

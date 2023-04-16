@@ -98,5 +98,32 @@ namespace WebLuto.Services
             if (clientEmail != null)
                 throw new Exception($"Já existe um cliente com o email: {email}");
         }
+
+        public void UpdateIsConfirmed(Client client, bool isConfirmed)
+        {
+            try
+            {
+                _clientRepository.UpdateIsConfirmed(client, isConfirmed);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public bool VerifyIsConfirmed(Client client)
+        {
+            try
+            {
+                if (client != null)
+                    return client.IsConfirmed;
+
+                return false;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
     }
 }

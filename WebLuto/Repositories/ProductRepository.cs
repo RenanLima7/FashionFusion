@@ -7,11 +7,11 @@ namespace WebLuto.Repositories
 {
     public class ProductRepository : IProductRepository
     {
-        private readonly WLDBContext _dbContext;
+        private readonly WLContext _dbContext;
 
-        public ProductRepository(WLDBContext wLDBContext)
+        public ProductRepository(WLContext wLContext)
         {
-            _dbContext = wLDBContext;
+            _dbContext = wLContext;
         }
 
         public async Task<List<Product>> GetAllProducts()

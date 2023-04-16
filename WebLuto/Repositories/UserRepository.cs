@@ -9,11 +9,11 @@ namespace WebLuto.Repositories
 {
     public class UserRepository : IUserRepository
     {
-        private readonly WLDBContext _dbContext;
+        private readonly WLContext _dbContext;
 
-        public UserRepository(WLDBContext wLDBContext)
+        public UserRepository(WLContext wLContext)
         {
-            _dbContext = wLDBContext;
+            _dbContext = wLContext;
         }
 
         public async Task<List<User>> GetAllUsers()

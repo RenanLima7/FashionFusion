@@ -1,37 +1,37 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Net;
+using WebLuto.DataContext;
 using WebLuto.DataContract.Requests;
 using WebLuto.DataContract.Responses;
 using WebLuto.Models;
+using WebLuto.Models.Enums;
 using WebLuto.Security;
 using WebLuto.Services.Interfaces;
 
 namespace WebLuto.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/")]
     [ApiController]
     public class ClientController : ControllerBase
     {
-        private readonly IClientService _clientService;
-
         private readonly IMapper _mapper;
-
+        private readonly IClientService _clientService;
         private readonly IAddressService _addressService;
-
         private readonly ITokenService _tokenService;
+        private readonly IEmailService _emailService;
 
-        public ClientController(IClientService clientService, IMapper mapper, IAddressService addressService, ITokenService tokenService)
+        public ClientController(IMapper mapper, IClientService clientService, IAddressService addressService, ITokenService tokenService, IEmailService emailService)
         {
-            _clientService = clientService;
             _mapper = mapper;
+            _clientService = clientService;
             _addressService = addressService;
             _tokenService = tokenService;
+            _emailService = emailService;
         }
 
         [HttpPost]
-        [Route("Login")]
+        [Route("login")]
         [AllowAnonymous]
         public async Task<ActionResult<dynamic>> Login([FromBody] LoginRequest loginRequest)
         {
@@ -42,11 +42,16 @@ namespace WebLuto.Controllers
                 if (client == null)
                     return NotFound(new { Success = false, Message = $"Não foi encontrado nenhum cliente" });
 
+                bool isConfirmed = _clientService.VerifyIsConfirmed(client);
+
+                if (!isConfirmed)
+                    return Unauthorized(new { Success = false, Message = $"Por favor, confirme seu email para prosseguir!" });
+
                 bool isValidPassword = Sha512Cryptographer.Compare(loginRequest.Password, client.Salt, client.Password);
 
                 if (isValidPassword)
                 {
-                    string jwtToken = _tokenService.GenerateToken(client.Username, client.Email, client.Id);
+                    string jwtToken = _tokenService.GenerateToken(client);
 
                     Address address = await _addressService.GetAddressByClientId(client.Id);
                     CreateAddressResponse addressResponse = _mapper.Map<CreateAddressResponse>(address);
@@ -66,7 +71,40 @@ namespace WebLuto.Controllers
         }
 
         [HttpGet]
-        [Route("GetClientById")]
+        [Route("confirmAccount/{token}")]
+        [AllowAnonymous]
+        public async Task<ActionResult<dynamic>> ConfirmAccount(string token)
+        {
+            try
+            {
+                _tokenService.IsValidToken("Bearer " + token);
+
+                long userId = _tokenService.GetUserIdFromJWTToken(token);
+
+                Client client = await _clientService.GetClientById(userId);
+
+                if (client == null)
+                    return NotFound(new { Success = false, Message = $"O token de autorização é inválido." });
+
+                bool isConfirmed = _clientService.VerifyIsConfirmed(client);
+
+                if (isConfirmed)
+                    return Ok(new { Success = true, Message = $"O Email já foi verificado anteriormente!" });
+                else
+                    _clientService.UpdateIsConfirmed(client, isConfirmed: true);
+
+                _tokenService.ExpireToken(token);
+
+                return Ok(new { Success = true, Message = "Email confirmado com sucesso!" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Success = false, ex.Message });
+            }
+        }
+
+        [HttpGet]
+        [Route("getClientById")]
         [WLToken]
         public async Task<ActionResult<dynamic>> GetClientById()
         {
@@ -94,7 +132,7 @@ namespace WebLuto.Controllers
         }
 
         [HttpGet]
-        [Route("GetAllClients")]
+        [Route("getAllClients")]
         [WLToken]
         public async Task<ActionResult<dynamic>> GetAllClients()
         {
@@ -129,9 +167,11 @@ namespace WebLuto.Controllers
         }
 
         [HttpPost]
-        [Route("CreateClient")]
+        [Route("createClient")]
         public async Task<ActionResult<dynamic>> CreateClient([FromBody] CreateClientRequest clientRequest)
         {
+            WLTransaction wLTransaction = new WLTransaction();
+
             try
             {
                 _clientService.ExistsClientWithUsernameOrEmail(clientRequest.Username, clientRequest.Email);
@@ -143,25 +183,32 @@ namespace WebLuto.Controllers
                 address.ClientId = clientCreated.Id;
                 Address addressCreated = await _addressService.CreateAddress(address);
 
-                string jwtToken = _tokenService.GenerateToken(clientCreated.Username, clientCreated.Email, clientCreated.Id);
+                string jwtToken = _tokenService.GenerateToken(clientCreated);
+
+                _emailService.SendEmail(clientCreated, EmailTemplateType.AccountCreation, jwtToken);
 
                 CreateClientResponse clientResponse = _mapper.Map<CreateClientResponse>(clientCreated);
                 CreateAddressResponse addressResponse = _mapper.Map<CreateAddressResponse>(addressCreated);
                 clientResponse.Address = addressResponse;
 
-                return Ok(new { Success = true, Client = clientResponse, Token = jwtToken });
+                wLTransaction.Commit();
+
+                return Ok(new { Success = true, Client = clientResponse });
             }
             catch (Exception ex)
             {
+                wLTransaction.Rollback();
                 return BadRequest(new { Success = false, ex.Message });
             }
         }
 
         [HttpPut]
-        [Route("UpdateClient")]
+        [Route("updateClient")]
         [WLToken]
         public async Task<ActionResult<dynamic>> UpdateClient([FromBody] UpdateClientRequest clientRequest)
         {
+            WLTransaction wLTransaction = new WLTransaction();
+
             try
             {
                 // Refresh Token
@@ -187,21 +234,26 @@ namespace WebLuto.Controllers
                 UpdateAddressResponse addressResponse = _mapper.Map<UpdateAddressResponse>(existingAddress);
 
                 UpdateClientResponse clientResponse = _mapper.Map<UpdateClientResponse>(clientUpdated);
-                clientResponse.Address = addressResponse;                
+                clientResponse.Address = addressResponse;
+
+                wLTransaction.Commit();
 
                 return Ok(new { Success = true, Client = clientResponse });
             }
             catch (Exception ex)
             {
+                wLTransaction.Rollback();
                 return BadRequest(new { Success = false, ex.Message });
             }
         }
 
         [HttpDelete]
-        [Route("DeleteClient")]
+        [Route("deleteClient")]
         [WLToken]
         public async Task<ActionResult<dynamic>> DeleteClient()
         {
+            WLTransaction wLTransaction = new WLTransaction();
+
             try
             {
                 Client existingClient = await _clientService.GetClientByEmailOrUsername(User.Identity.Name);
@@ -216,6 +268,10 @@ namespace WebLuto.Controllers
                     Address address = await _addressService.GetAddressByClientId(existingClient.Id);
                     _addressService.DeleteAddress(address);
 
+                    wLTransaction.Commit();
+
+                    _emailService.SendEmail(existingClient, EmailTemplateType.AccountDeletion);
+
                     return Ok(new { Success = true, Message = $"Cliente {existingClient.Username} excluído com sucesso!" });
                 }
                 else
@@ -223,6 +279,7 @@ namespace WebLuto.Controllers
             }
             catch (Exception ex)
             {
+                wLTransaction.Rollback();
                 return BadRequest(new { Success = false, ex.Message });
             }
         }
