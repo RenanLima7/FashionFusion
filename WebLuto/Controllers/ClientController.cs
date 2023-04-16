@@ -174,7 +174,15 @@ namespace WebLuto.Controllers
 
             try
             {
-                _clientService.ExistsClientWithUsernameOrEmail(clientRequest.Username, clientRequest.Email);
+                Client clientUsername = await _clientService.GetClientByEmailOrUsername(clientRequest.Username);
+
+                if (clientUsername != null)
+                    throw new Exception($"Já existe um cliente com o username: {clientRequest.Username}");
+
+                Client clientEmail = await _clientService.GetClientByEmailOrUsername(clientRequest.Email);
+
+                if (clientEmail != null)
+                    throw new Exception($"Já existe um cliente com o email: {clientRequest.Email}");
 
                 Client client = _mapper.Map<Client>(clientRequest);
                 Client clientCreated = await _clientService.CreateClient(client);
@@ -217,8 +225,21 @@ namespace WebLuto.Controllers
                 if (existingClient == null)
                     return NotFound(new { Success = false, Message = $"Não foi encontrado nenhum cliente" });
 
-                if (!string.IsNullOrEmpty(clientRequest.Username) || !string.IsNullOrEmpty(clientRequest.Email))
-                    _clientService.ExistsClientWithUsernameOrEmail(clientRequest.Username, clientRequest.Email);
+                if (!string.IsNullOrEmpty(clientRequest.Username))
+                {
+                    Client clientUsername = await _clientService.GetClientByEmailOrUsername(clientRequest.Username);
+
+                    if (clientUsername != null)
+                        throw new Exception($"Já existe um cliente com o username: {clientRequest.Username}");
+                }
+
+                if (!string.IsNullOrEmpty(clientRequest.Email))
+                {
+                    Client clientEmail = await _clientService.GetClientByEmailOrUsername(clientRequest.Email);
+
+                    if (clientEmail != null)
+                        throw new Exception($"Já existe um cliente com o email: {clientRequest.Email}");
+                }
 
                 Client clientToUpdated = _mapper.Map<Client>(clientRequest);
                 Client clientUpdated = await _clientService.UpdateClient(clientToUpdated, existingClient);

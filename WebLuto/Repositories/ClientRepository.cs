@@ -24,9 +24,9 @@ namespace WebLuto.Repositories
                     .Where(x => x.DeletionDate == null)
                     .ToListAsync();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw new Exception(string.Format("Erro ao buscar todos os clientes!"));
+                throw new Exception(string.Format($"Erro ao buscar todos os clientes! - {ex}"));
             }
         }
 
@@ -40,9 +40,9 @@ namespace WebLuto.Repositories
                     x.DeletionDate == null
                 );
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw new Exception(string.Format("Erro ao buscar o cliente com o Id: {0}", id));
+                throw new Exception(string.Format($"Erro ao buscar o cliente com o Id: {id} - {ex}"));
             }
         }
 
@@ -56,9 +56,9 @@ namespace WebLuto.Repositories
                     x.DeletionDate == null
                 );
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw new Exception(string.Format("Erro ao buscar o cliente: {0}", emailOrUsername));
+                throw new Exception(string.Format($"Erro ao buscar o cliente: {emailOrUsername} - {ex}"));
             }
         }
 
@@ -85,9 +85,9 @@ namespace WebLuto.Repositories
 
                 return clientToCreate;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw new Exception(string.Format("Erro ao criar o cliente!"));
+                throw new Exception(string.Format($"Erro ao criar o cliente! - {ex}"));
             }
         }
 
@@ -112,9 +112,9 @@ namespace WebLuto.Repositories
 
                 return existingClient;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw new Exception(string.Format("Erro ao atualizar o cliente: {0}", existingClient.Id));
+                throw new Exception(string.Format($"Erro ao atualizar o cliente: {existingClient.Id} - {ex}"));
             }
         }
 
@@ -129,9 +129,9 @@ namespace WebLuto.Repositories
 
                 return true;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw new Exception(string.Format("Erro ao deletar o cliente: {0}", clientToDelete.Id));
+                throw new Exception(string.Format($"Erro ao deletar o cliente: {clientToDelete.Id} - {ex}"));
             }
         }
 
@@ -145,9 +145,9 @@ namespace WebLuto.Repositories
                 _dbContext.Client.Update(client);
                 await _dbContext.SaveChangesAsync();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw new Exception(string.Format("Erro ao confirmar a conta do cliente: {0}", client.Id));
+                throw new Exception(string.Format($"Erro ao confirmar a conta do cliente: {client.Id} - {ex}"));
             }
         }
     }
