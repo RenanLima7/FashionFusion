@@ -26,7 +26,7 @@ namespace WebLuto.Services
             smtp.Host = "smtp.gmail.com";
             smtp.Port = 587;
             smtp.UseDefaultCredentials = false;
-            smtp.Credentials = new NetworkCredential(new Settings().EmailContact, new Settings().EmailPassword);
+            smtp.Credentials = new NetworkCredential(new Settings().EmailContact, "ipbxhgtkikkbzrxv");
             smtp.EnableSsl = true;
 
             smtp.Send(mailMessage);
