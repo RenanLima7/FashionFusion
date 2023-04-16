@@ -227,13 +227,13 @@ namespace WebLuto.Controllers
                 CreateAddressResponse addressResponse = _mapper.Map<CreateAddressResponse>(addressCreated);
                 clientResponse.Address = addressResponse;
 
-                await wLTransaction.Commit();
+                wLTransaction.Commit();
 
                 return Ok(new { Success = true, Client = clientResponse });
             }
             catch (Exception ex)
             {
-                await wLTransaction.Rollback();
+                wLTransaction.Rollback();
                 return BadRequest(new { Success = false, ex.Message });
             }
         }
@@ -285,13 +285,13 @@ namespace WebLuto.Controllers
                 UpdateClientResponse clientResponse = _mapper.Map<UpdateClientResponse>(clientUpdated);
                 clientResponse.Address = addressResponse;
 
-                await wLTransaction.Commit();
+                wLTransaction.Commit();
 
                 return Ok(new { Success = true, Client = clientResponse });
             }
             catch (Exception ex)
             {
-                await wLTransaction.Rollback();
+                wLTransaction.Rollback();
                 return BadRequest(new { Success = false, ex.Message });
             }
         }
@@ -315,9 +315,9 @@ namespace WebLuto.Controllers
                 if (successDeletedClient)
                 {
                     Address address = await _addressService.GetAddressByClientId(existingClient.Id);
-                    await _addressService.DeleteAddress(address);
+                    _addressService.DeleteAddress(address);
 
-                    await wLTransaction.Commit();
+                    wLTransaction.Commit();
 
                     _emailService.SendEmail(existingClient, EmailTemplateType.AccountDeletion);
 
@@ -328,7 +328,7 @@ namespace WebLuto.Controllers
             }
             catch (Exception ex)
             {
-                await wLTransaction.Rollback();
+                wLTransaction.Rollback();
                 return BadRequest(new { Success = false, ex.Message });
             }
         }
