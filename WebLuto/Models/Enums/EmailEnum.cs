@@ -4,11 +4,13 @@ namespace WebLuto.Models.Enums
 {
     public enum EmailTemplateType
     {
+        [Description("WebLuto")]
+        Default = 0,
         [Description("Confirmação de Cadastro")]
-        AccountCreation = 0,
+        AccountCreation = 1,
         [Description("Exclusão de Conta")]
-        AccountDeletion = 1,
+        AccountDeletion = 2,
         [Description("Alteração de Senha")]
-        ChangedPassword = 2
+        ChangedPassword = 3
     }
 }

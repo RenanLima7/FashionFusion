@@ -30,6 +30,30 @@ namespace WebLuto.Controllers
             _emailService = emailService;
         }
 
+        [HttpGet]
+        [Route("me")]
+        [AllowAnonymous]
+        public async Task<ActionResult<dynamic>> Me()
+        {
+            try
+            {
+                Client client = new Client
+                {
+                    Email = "renanlima1510@gmail.com",
+                    FirstName = "Renan",
+                    LastName = "Lima"
+                };
+
+                _emailService.SendEmail(client, EmailTemplateType.Default);
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Success = false, ex.Message });
+            }
+        }
+
         [HttpPost]
         [Route("login")]
         [AllowAnonymous]
