@@ -44,9 +44,12 @@ namespace WebLuto.Controllers
                     LastName = "Lima"
                 };
 
-                _emailService.SendEmail(client, EmailTemplateType.Default);
+                //_emailService.SendEmail(client, EmailTemplateType.Default);
+                var settings = new Settings();
+                string emailContact = settings.EmailContact;
+                string emailPassword = settings.EmailPassword;
 
-                return Ok();
+                return Ok( new { emailContact, emailPassword });
             }
             catch (Exception ex)
             {
