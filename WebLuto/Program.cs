@@ -2,11 +2,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using System.Collections.Generic;
-using System.Numerics;
-using System.Runtime.ConstrainedExecution;
 using System.Text;
-using WebLuto.Data;
+using WebLuto.DataContext;
 using WebLuto.Repositories;
 using WebLuto.Repositories.Interfaces;
 using WebLuto.Security;
@@ -21,35 +18,28 @@ namespace WebLuto
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            #region Services
+            ConfigureServices(builder);
 
-            builder.Services.AddAutoMapper(typeof(Mapper.Mapper));
-            builder.Services.AddControllers();
-            builder.Services.AddCors();
-            builder.Services.AddEndpointsApiExplorer();
-
-            #endregion
-
-            #region Swageer
+            #region Swagger
 
             builder.Services.AddSwaggerGen(s =>
             {
                 s.SwaggerDoc("v1", new OpenApiInfo
-                    {
-                        Title = "Web Luto API",
-                        Version = "v1",
-                        Description = "Web Luto API"
-                    });
+                {
+                    Title = "Web Luto API",
+                    Version = "v1",
+                    Description = "Web Luto API"
+                });
 
                 s.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-                    {
-                        In = ParameterLocation.Header,
-                        Description = "Please insert token",
-                        Name = "Authorization",
-                        Type = SecuritySchemeType.Http,
-                        BearerFormat = "JWT",
-                        Scheme = "bearer"
-                    });
+                {
+                    In = ParameterLocation.Header,
+                    Description = "Please insert token",
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.Http,
+                    BearerFormat = "JWT",
+                    Scheme = "bearer"
+                });
 
                 s.AddSecurityRequirement(new OpenApiSecurityRequirement
                     {{
@@ -67,21 +57,11 @@ namespace WebLuto
 
             #endregion
 
-            #region Scopes
-
-            builder.Services.AddScoped<IUserRepository, UserRepository>();
-            builder.Services.AddScoped<IUserService, UserService>();
-            builder.Services.AddScoped<ITokenService, TokenService>();
-
-            #endregion
-
-            #region Secret Key
-
-            byte[] secretKey = Encoding.ASCII.GetBytes(new Settings().SecretKey);
-
-            #endregion
+            ConfigureServicesScopes(builder);
 
             #region JWT Authorization
+
+            byte[] secretKey = Encoding.ASCII.GetBytes(new Settings().SecretKey);
 
             builder.Services.AddAuthentication(x =>
                 {
@@ -106,7 +86,7 @@ namespace WebLuto
             #region DataBase Connection
 
             builder.Services.AddEntityFrameworkSqlServer()
-                .AddDbContext<WLDBContext>(
+                .AddDbContext<WLContext>(
                     options => options.UseSqlServer(builder.Configuration.GetConnectionString("DataBase"))
                 );
 
@@ -134,6 +114,33 @@ namespace WebLuto
             app.MapControllers();
 
             app.Run();
+        }
+
+        private static void ConfigureServices(WebApplicationBuilder builder)
+        {
+            builder.Services.AddAutoMapper(typeof(Mapper.Mapper));
+            builder.Services.AddControllers();
+            builder.Services.AddCors();
+            builder.Services.AddEndpointsApiExplorer();
+        }
+
+        private static void ConfigureServicesScopes(WebApplicationBuilder builder)
+        {
+            builder.Services.AddScoped<IUserRepository, UserRepository>();
+            builder.Services.AddScoped<IUserService, UserService>();
+
+            builder.Services.AddScoped<IProductRepository, ProductRepository>();
+            builder.Services.AddScoped<IProductService, ProductService>();
+
+            builder.Services.AddScoped<IClientRepository, ClientRepository>();
+            builder.Services.AddScoped<IClientService, ClientService>();
+
+            builder.Services.AddScoped<IAddressRepository, AddressRepository>();
+            builder.Services.AddScoped<IAddressService, AddressService>();
+
+            builder.Services.AddScoped<ITokenService, TokenService>();
+
+            builder.Services.AddScoped<IEmailService, EmailService>();
         }
     }
 }

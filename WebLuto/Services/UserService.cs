@@ -19,9 +19,7 @@ namespace WebLuto.Services
         {
             try
             {
-                List<User> userList = await _userRepository.GetAllUsers();
-
-                return userList;
+                return await _userRepository.GetAllUsers();
             }
             catch (Exception ex)
             {
@@ -33,9 +31,7 @@ namespace WebLuto.Services
         {
             try
             {
-                User user = await _userRepository.GetUserById(id);
-
-                return user;
+                return await _userRepository.GetUserById(id);
             }
             catch (Exception ex)
             {
@@ -47,9 +43,7 @@ namespace WebLuto.Services
         {
             try
             {
-                User user = await _userRepository.GetUserByUsername(username);
-
-                return user;
+                return await _userRepository.GetUserByUsername(username);
             }
             catch (Exception ex)
             {
@@ -61,9 +55,7 @@ namespace WebLuto.Services
         {
             try
             {
-                User userCreated = await _userRepository.CreateUser(userToCreate);
-
-                return userCreated;
+                return await _userRepository.CreateUser(userToCreate);
             }
             catch (Exception ex)
             {
@@ -75,9 +67,7 @@ namespace WebLuto.Services
         {
             try
             {
-                User userUpdated = await _userRepository.UpdateUser(userToUpdate, existingUser);
-
-                return userUpdated;
+                return await _userRepository.UpdateUser(userToUpdate, existingUser);
             }
             catch (Exception ex)
             {

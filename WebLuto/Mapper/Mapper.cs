@@ -2,7 +2,6 @@
 using WebLuto.DataContract.Requests;
 using WebLuto.DataContract.Responses;
 using WebLuto.Models;
-using WebLuto.Models.Enums.UserEnum;
 
 namespace WebLuto.Mapper
 {
@@ -10,24 +9,64 @@ namespace WebLuto.Mapper
     {
         public Mapper()
         {
+            UserMap();
+            ProductMap();
             ClientMap();
+            AddressMap();
+        }
+
+        public void UserMap()
+        {
+            CreateMap<User, LoginResponse>();
+
+            CreateMap<CreateUserRequest, User>();
+
+            CreateMap<User, CreateUserResponse>();
+
+            CreateMap<UpdateUserRequest, User>();
+
+            CreateMap<User, UpdateUserResponse>();
+        }
+
+        public void ProductMap()
+        {
+            CreateMap<CreateProductRequest, Product>()
+                .ForMember(x => x.Type, options => options.MapFrom(y => y.Type));
+
+            CreateMap<Product, CreateProductResponse>()
+                .ForMember(x => x.Type, options => options.MapFrom(y => y.Type));
+
+            CreateMap<UpdateProductRequest, Product>()
+                .ForMember(x => x.Type, options => options.MapFrom(y => y.Type));
+
+            CreateMap<Product, UpdateProductResponse>()
+                .ForMember(x => x.Type, options => options.MapFrom(y => y.Type));
         }
 
         public void ClientMap()
         {
-            CreateMap<User, LoginResponse>();
+            CreateMap<Client, LoginResponse>();
 
-            CreateMap<CreateUserRequest, User>()
-                .ForMember(x => x.Type, options => options.MapFrom(y => y.Type));
+            CreateMap<Client, LoginClientResponse>();
 
-            CreateMap<User, CreateUserResponse>()
-                .ForMember(x => x.Type, options => options.MapFrom(y => y.Type));
-            
-            CreateMap<UpdateUserRequest, User>()
-                .ForMember(x => x.Type, options => options.MapFrom(y => y.Type));
+            CreateMap<CreateClientRequest, Client>();
 
-            CreateMap<User, UpdateUserResponse>()
-                .ForMember(x => x.Type, options => options.MapFrom(y => y.Type));
+            CreateMap<Client, CreateClientResponse>();
+
+            CreateMap<UpdateClientRequest, Client>();
+
+            CreateMap<Client, UpdateClientResponse>();
+        }
+
+        private void AddressMap()
+        {
+            CreateMap<CreateAddressRequest, Address>();
+
+            CreateMap<Address, CreateAddressResponse>();
+
+            CreateMap<UpdateAddressRequest, Address>();
+
+            CreateMap<Address, UpdateAddressResponse>();
         }
     }
 }

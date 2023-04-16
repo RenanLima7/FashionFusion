@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
-using System.Security.Cryptography;
-using System.Text;
+using System.ComponentModel;
+using System.Reflection;
 
 namespace WebLuto.Utils
 {
@@ -28,12 +28,15 @@ namespace WebLuto.Utils
             return fieldsErrors.ToArray();
         }
 
-        public static long GenerateSaltAsLong()
+        public static int GenerateSalt()
         {
-            byte[] salt = new byte[16];
-            new RNGCryptoServiceProvider().GetBytes(salt);
+            return new Random().Next(111111, 999999);
+        }
 
-            return BitConverter.ToInt64(salt, 0);
+        public static string GetEnumDescription(Enum value)
+        {
+            var field = value.GetType().GetField(value.ToString());
+            return field.GetCustomAttribute<DescriptionAttribute>()?.Description;
         }
     }
 }

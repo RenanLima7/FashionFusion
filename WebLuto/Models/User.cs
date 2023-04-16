@@ -1,4 +1,5 @@
-﻿using WebLuto.Models.Enums.UserEnum;
+﻿using WebLuto.Common;
+using WebLuto.Models.Enums;
 
 namespace WebLuto.Models
 {
@@ -6,10 +7,10 @@ namespace WebLuto.Models
     {
         public string Username { get; set; }
 
+        public string Email { get; set; }
+
         public string Password { get; set; }
 
-        public long Salt { get; set; }
-
-        public UserType Type { get; set; }
+        public int Salt { get; set; }
     }
 }

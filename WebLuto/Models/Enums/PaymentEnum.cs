@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace WebLuto.Models.Enums.ProductEnum
+namespace WebLuto.Models.Enums
 {
     public enum PaymentType
     {

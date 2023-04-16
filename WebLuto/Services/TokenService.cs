@@ -1,4 +1,5 @@
 ﻿using Microsoft.IdentityModel.Tokens;
+using NuGet.Common;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -12,7 +13,7 @@ namespace WebLuto.Services
     {
         public TokenService() { }
 
-        public string GenerateToken(User user)
+        public string GenerateToken(Client client)
         {
             try
             {
@@ -24,10 +25,11 @@ namespace WebLuto.Services
                 {
                     Subject = new ClaimsIdentity(new Claim[]
                     {
-                        new Claim(ClaimTypes.Name, user.Username.ToString()),
-                        new Claim(ClaimTypes.Role, user.Type.ToString())
+                        new Claim(ClaimTypes.Name, client.Username),
+                        new Claim(ClaimTypes.Email, client.Email),
+                        new Claim("UserId", client.Id.ToString()),
                     }),
-                    Expires = DateTime.UtcNow.AddHours(2),
+                    Expires = DateTime.UtcNow.AddDays(7),
                     SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(secretKey), SecurityAlgorithms.HmacSha256)
                 };
 
@@ -37,19 +39,47 @@ namespace WebLuto.Services
             }
             catch (Exception ex)
             {
-                throw new Exception($"Houve um erro ao gerar o token! \nErro - {ex}");
+                throw new Exception($"Houve um erro ao gerar o token - {ex}");
             }
         }
 
         public void IsValidToken(string authorizationHeader)
         {
-            if (string.IsNullOrEmpty(authorizationHeader) || !authorizationHeader.StartsWith("Bearer "))
-                throw new Exception("Token de autorização inválido");
+            try
+            {
+                if (string.IsNullOrEmpty(authorizationHeader))
+                    throw new SecurityTokenInvalidSignatureException();
 
-            string token = authorizationHeader.Substring("Bearer ".Length).Trim();
+                if (!authorizationHeader.StartsWith("Bearer "))
+                    throw new SecurityTokenInvalidSigningKeyException();
 
-            if (IsExpiredToken(token))
-                throw new Exception("Token de autorização expirado!");
+                string token = authorizationHeader.Substring("Bearer ".Length).Trim();
+
+                if (IsExpiredToken(token))
+                    throw new SecurityTokenExpiredException();
+            }
+            catch (Exception ex)
+            {
+                string message;
+
+                switch (ex)
+                {
+                    case SecurityTokenInvalidSignatureException:
+                        message = "O token de autorização é inválido.";
+                        break;
+                    case SecurityTokenInvalidSigningKeyException:
+                        message = "O token de autorização deve conter o prefixo \"Bearer \".";
+                        break;
+                    case SecurityTokenExpiredException:
+                        message = "O token de autorização expirou.";
+                        break;
+                    default:
+                        message = "Ocorreu um erro ao processar a solicitação.";
+                        break;
+                }
+
+                throw new Exception(message);
+            }
         }
 
         public bool IsExpiredToken(string token)
@@ -61,9 +91,66 @@ namespace WebLuto.Services
 
                 return jwtToken.ValidTo < DateTime.UtcNow;
             }
+            catch (Exception)
+            {
+                throw new SecurityTokenInvalidSignatureException();
+            }
+        }
+
+        public long GetUserIdFromJWTToken(string token)
+        {
+            try
+            {
+                JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
+                JwtSecurityToken jwtToken = handler.ReadJwtToken(token);
+
+                string userid = jwtToken.Claims.FirstOrDefault(c => c.Type == "UserId")?.Value;
+
+                return long.Parse(userid);
+            }
             catch (Exception ex)
             {
-                throw new Exception($"Erro ao verificar a validade do token! \nErro - {ex}");
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public bool ExpireToken(string token)
+        {
+            var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(new Settings().SecretKey));
+            var tokenHandler = new JwtSecurityTokenHandler();
+
+            var validationParameters = new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = secretKey,
+                ValidateAudience = false,
+                ValidateIssuer = false,
+                ClockSkew = TimeSpan.Zero
+            };
+
+            try
+            {
+                SecurityToken validatedToken;
+                var claimsPrincipal = tokenHandler.ValidateToken(token, validationParameters, out validatedToken);
+
+                var expirationDateUnix = long.Parse(claimsPrincipal.FindFirst("exp").Value);
+                var expirationDateUtc = DateTimeOffset.FromUnixTimeSeconds(expirationDateUnix).UtcDateTime;
+
+                var newTokenDescriptor = new SecurityTokenDescriptor
+                {
+                    Subject = claimsPrincipal.Identity as ClaimsIdentity,
+                    Expires = DateTime.UtcNow.AddSeconds(1),
+                    SigningCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256Signature)
+                };
+
+                var newToken = tokenHandler.CreateToken(newTokenDescriptor);
+                var newTokenString = tokenHandler.WriteToken(newToken);
+
+                return true;
+            }
+            catch
+            {
+                return false;
             }
         }
     }

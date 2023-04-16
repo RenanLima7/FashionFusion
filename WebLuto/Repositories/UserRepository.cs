@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using WebLuto.Data;
+using WebLuto.DataContext;
 using WebLuto.Models;
 using WebLuto.Repositories.Interfaces;
 using WebLuto.Security;
@@ -9,11 +9,11 @@ namespace WebLuto.Repositories
 {
     public class UserRepository : IUserRepository
     {
-        private readonly WLDBContext _dbContext;
+        private readonly WLContext _dbContext;
 
-        public UserRepository(WLDBContext wLDBContext)
+        public UserRepository(WLContext wLContext)
         {
-            _dbContext = wLDBContext;
+            _dbContext = wLContext;
         }
 
         public async Task<List<User>> GetAllUsers()
@@ -67,7 +67,7 @@ namespace WebLuto.Repositories
             try
             {
                 userToCreate.CreationDate = DateTime.Now;
-                userToCreate.Salt = UtilityMethods.GenerateSaltAsLong();
+                userToCreate.Salt = UtilityMethods.GenerateSalt();
                 userToCreate.Password = Sha512Cryptographer.Encrypt(userToCreate.Password, userToCreate.Salt);
 
                 await _dbContext.User.AddAsync(userToCreate);
@@ -87,7 +87,6 @@ namespace WebLuto.Repositories
             {                
                 existingUser.Username = userToUpdate.Username ?? existingUser.Username;
                 existingUser.Password = userToUpdate.Password != null ? Sha512Cryptographer.Encrypt(userToUpdate.Password, existingUser.Salt) : existingUser.Password;
-                existingUser.Type = userToUpdate.Type != existingUser.Type ? userToUpdate.Type : existingUser.Type;
                 existingUser.UpdateDate = DateTime.Now;
 
                 _dbContext.User.Update(existingUser);
@@ -105,7 +104,7 @@ namespace WebLuto.Repositories
         {
             try
             {
-                //_dbContext.User.Remove(userExists);
+                //_dbContext.User.Remove(userToDelete);
 
                 userToDelete.DeletionDate = DateTime.Now;
 
