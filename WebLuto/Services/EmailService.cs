@@ -12,6 +12,7 @@ namespace WebLuto.Services
     {
         public void SendEmail(Client client, EmailTemplateType emailTemplateType, string token = null)
         {
+            Settings settings = new Settings();
             string emailDestination = client.Email;
             string clientName = client.FirstName + " " + client.LastName;
 
@@ -26,7 +27,7 @@ namespace WebLuto.Services
             smtp.Host = "smtp.gmail.com";
             smtp.Port = 587;
             smtp.UseDefaultCredentials = false;
-            smtp.Credentials = new NetworkCredential(new Settings().EmailContact, "ipbxhgtkikkbzrxv");
+            smtp.Credentials = new NetworkCredential(settings.EmailContact, settings.EmailPassword);
             smtp.EnableSsl = true;
 
             smtp.Send(mailMessage);
@@ -34,7 +35,7 @@ namespace WebLuto.Services
 
         public string GetEmailTemplateType(string clientName, EmailTemplateType templateType, string token = null)
         {
-            string emailBody = "";
+            string emailBody;
             string title = UtilityMethods.GetEnumDescription(templateType);
             string confirmationLink = new Settings().DefaultUrlApi + "api/confirmAccount/" + token;
 
