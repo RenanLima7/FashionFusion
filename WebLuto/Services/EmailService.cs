@@ -2,9 +2,9 @@
 using System.Net.Mail;
 using WebLuto.Models;
 using WebLuto.Models.Enums;
+using WebLuto.Security;
 using WebLuto.Services.Interfaces;
 using WebLuto.Utils;
-using WebLuto.Security;
 
 namespace WebLuto.Services
 {
@@ -84,11 +84,12 @@ namespace WebLuto.Services
                           </body>
                         </html>";
                     break;
+                case EmailTemplateType.Default:
                 default:
                     emailBody = $@"
                         <html>
                           <head>
-                            <title>WebLuto</title>
+                            <title>{title}</title>
                           </head>
                           <body>
                             <p>Olá, {clientName}!</p>
