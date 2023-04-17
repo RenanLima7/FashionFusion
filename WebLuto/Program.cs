@@ -141,6 +141,8 @@ namespace WebLuto
             builder.Services.AddScoped<ITokenService, TokenService>();
 
             builder.Services.AddScoped<IEmailService, EmailService>();
+
+            builder.Services.AddScoped<IFileService, FileService>();
         }
     }
 }

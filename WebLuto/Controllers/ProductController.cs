@@ -17,13 +17,10 @@ namespace WebLuto.Controllers
 
         private readonly IMapper _mapper;
 
-        private readonly ITokenService _tokenService;
-
-        public ProductController(IProductService productService, IMapper mapper, ITokenService tokenService)
+        public ProductController(IProductService productService, IMapper mapper)
         {
             _productService = productService;
             _mapper = mapper;
-            _tokenService = tokenService;
         }
 
         [HttpGet]

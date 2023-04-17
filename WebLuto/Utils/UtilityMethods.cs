@@ -38,5 +38,10 @@ namespace WebLuto.Utils
             var field = value.GetType().GetField(value.ToString());
             return field.GetCustomAttribute<DescriptionAttribute>()?.Description;
         }
+
+        public static string GenerateRandomFileName(string name)
+        {
+            return name + "_" + Guid.NewGuid().ToString();
+        }
     }
 }

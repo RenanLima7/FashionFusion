@@ -20,14 +20,16 @@ namespace WebLuto.Controllers
         private readonly IAddressService _addressService;
         private readonly ITokenService _tokenService;
         private readonly IEmailService _emailService;
+        private readonly IFileService _fileService;
 
-        public ClientController(IMapper mapper, IClientService clientService, IAddressService addressService, ITokenService tokenService, IEmailService emailService)
+        public ClientController(IMapper mapper, IClientService clientService, IAddressService addressService, ITokenService tokenService, IEmailService emailService, IFileService fileService)
         {
             _mapper = mapper;
             _clientService = clientService;
             _addressService = addressService;
             _tokenService = tokenService;
             _emailService = emailService;
+            _fileService = fileService;
         }
 
         [HttpGet]
@@ -213,6 +215,12 @@ namespace WebLuto.Controllers
                     throw new Exception($"Já existe um cliente com o email: {clientRequest.Email}");
 
                 Client client = _mapper.Map<Client>(clientRequest);
+
+                if (client.Avatar != null)
+                {
+                    client.Avatar = _fileService.UploadBase64Image(client.Username, client.Avatar, "images");
+                }
+
                 Client clientCreated = await _clientService.CreateClient(client);
 
                 Address address = _mapper.Map<Address>(clientRequest.Address);
@@ -247,7 +255,6 @@ namespace WebLuto.Controllers
 
             try
             {
-                // Refresh Token
                 Client existingClient = await _clientService.GetClientByEmailOrUsername(User.Identity.Name);
 
                 if (existingClient == null)
@@ -270,6 +277,17 @@ namespace WebLuto.Controllers
                 }
 
                 Client clientToUpdated = _mapper.Map<Client>(clientRequest);
+
+                if (clientToUpdated.Avatar != null)
+                {
+                    string entityIdentifier = clientToUpdated.Username ?? existingClient.Username;
+
+                    if (existingClient.Avatar != null)
+                        clientToUpdated.Avatar = _fileService.UpdateImageStorage(existingClient.Avatar, clientToUpdated.Avatar, "images");
+                    else
+                        clientToUpdated.Avatar = _fileService.UploadBase64Image(entityIdentifier, clientToUpdated.Avatar, "images");
+                }
+
                 Client clientUpdated = await _clientService.UpdateClient(clientToUpdated, existingClient);
 
                 Address existingAddress = await _addressService.GetAddressByClientId(existingClient.Id);
@@ -316,6 +334,8 @@ namespace WebLuto.Controllers
                 {
                     Address address = await _addressService.GetAddressByClientId(existingClient.Id);
                     _addressService.DeleteAddress(address);
+
+                    _fileService.DeleteImageStorage(existingClient.Avatar, "images");
 
                     wLTransaction.Commit();
 
