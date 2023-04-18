@@ -41,7 +41,7 @@ namespace WebLuto.Controllers
                 //    UtilityMethods.GetFieldsErrors(ModelState);
                 //}
 
-                User user = await _userService.GetUserByUsername(loginRequest.Username);
+                User user = await _userService.GetUserByUsername(loginRequest.Email);
 
                 if (user == null)
                     return NotFound(new { Success = false, Message = $"Não foi encontrado nenhum usuário" });

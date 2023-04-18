@@ -8,6 +8,7 @@ using WebLuto.Models;
 using WebLuto.Models.Enums;
 using WebLuto.Security;
 using WebLuto.Services.Interfaces;
+using WebLuto.Utils.Messages;
 
 namespace WebLuto.Controllers
 {
@@ -20,34 +21,32 @@ namespace WebLuto.Controllers
         private readonly IAddressService _addressService;
         private readonly ITokenService _tokenService;
         private readonly IEmailService _emailService;
+        private readonly IFileService _fileService;
 
-        public ClientController(IMapper mapper, IClientService clientService, IAddressService addressService, ITokenService tokenService, IEmailService emailService)
+        public ClientController(IMapper mapper, IClientService clientService, IAddressService addressService, ITokenService tokenService, IEmailService emailService, IFileService fileService)
         {
             _mapper = mapper;
             _clientService = clientService;
             _addressService = addressService;
             _tokenService = tokenService;
             _emailService = emailService;
+            _fileService = fileService;
         }
 
         [HttpGet]
         [Route("me")]
-        [Authorize]
+        [WLToken]
         public async Task<ActionResult<dynamic>> Me()
         {
             try
             {
-                Client client = await _clientService.GetClientByEmailOrUsername(User.Identity.Name);
+                Client client = await _clientService.GetClientByEmail(User.Identity.Name);
 
                 if (client == null)
-                    return Unauthorized(new { Success = false, Message = $"Token inválido!" });
+                    return Unauthorized(new { Success = false, Message = TokenMsg.EXC0001 });
                 else
                 {
-                    Address address = await _addressService.GetAddressByClientId(client.Id);
-                    CreateAddressResponse addressResponse = _mapper.Map<CreateAddressResponse>(address);
-
                     LoginClientResponse loginResponse = _mapper.Map<LoginClientResponse>(client);
-                    loginResponse.Address = addressResponse;
 
                     return Ok(new { Success = true, Client = loginResponse });
                 }
@@ -60,20 +59,19 @@ namespace WebLuto.Controllers
 
         [HttpPost]
         [Route("login")]
-        [AllowAnonymous]
         public async Task<ActionResult<dynamic>> Login([FromBody] LoginRequest loginRequest)
         {
             try
             {
-                Client client = await _clientService.GetClientByEmailOrUsername(loginRequest.Username);
+                Client client = await _clientService.GetClientByEmail(loginRequest.Email);
 
                 if (client == null)
-                    return NotFound(new { Success = false, Message = $"Não foi encontrado nenhum cliente" });
+                    return NotFound(new { Success = false, Message = ClientMsg.EXC0001 });
 
                 bool isConfirmed = _clientService.VerifyIsConfirmed(client);
 
                 if (!isConfirmed)
-                    return Unauthorized(new { Success = false, Message = $"Por favor, confirme seu email para prosseguir!" });
+                    return Unauthorized(new { Success = false, Message = EmailMsg.EXC0001 });
 
                 bool isValidPassword = Sha512Cryptographer.Compare(loginRequest.Password, client.Salt, client.Password);
 
@@ -81,16 +79,12 @@ namespace WebLuto.Controllers
                 {
                     string jwtToken = _tokenService.GenerateToken(client);
 
-                    Address address = await _addressService.GetAddressByClientId(client.Id);
-                    CreateAddressResponse addressResponse = _mapper.Map<CreateAddressResponse>(address);
-
                     LoginClientResponse loginResponse = _mapper.Map<LoginClientResponse>(client);
-                    loginResponse.Address = addressResponse;
 
                     return Ok(new { Success = true, Client = loginResponse, Token = jwtToken });
                 }
                 else
-                    return BadRequest(new { Success = false, Message = "Cliente ou senha inválidos!" });
+                    return BadRequest(new { Success = false, Message = ApiMsg.EXC0001 });
             }
             catch (Exception ex)
             {
@@ -100,7 +94,6 @@ namespace WebLuto.Controllers
 
         [HttpGet]
         [Route("confirmAccount/{token}")]
-        [AllowAnonymous]
         public async Task<ActionResult<dynamic>> ConfirmAccount(string token)
         {
             try
@@ -112,46 +105,18 @@ namespace WebLuto.Controllers
                 Client client = await _clientService.GetClientById(userId);
 
                 if (client == null)
-                    return NotFound(new { Success = false, Message = $"O token de autorização é inválido." });
+                    return NotFound(new { Success = false, Message = TokenMsg.EXC0001 });
 
                 bool isConfirmed = _clientService.VerifyIsConfirmed(client);
 
                 if (isConfirmed)
-                    return Ok(new { Success = true, Message = $"O Email já foi verificado anteriormente!" });
+                    return Ok(new { Success = true, Message = EmailMsg.EXC0002 });
                 else
                     _clientService.UpdateIsConfirmed(client, isConfirmed: true);
 
-                _tokenService.ExpireToken(token);
+                _tokenService.ExpireToken(token); // ToDo : Verificar Expiração
 
-                return Ok(new { Success = true, Message = "Email confirmado com sucesso!" });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { Success = false, ex.Message });
-            }
-        }
-
-        [HttpGet]
-        [Route("getClientById")]
-        [WLToken]
-        public async Task<ActionResult<dynamic>> GetClientById()
-        {
-            try
-            {
-                Client client = await _clientService.GetClientByEmailOrUsername(User.Identity.Name);
-
-                if (client == null)
-                    return NotFound(new { Success = false, Message = $"Não foi encontrado nenhum cliente!" });
-                else
-                {
-                    Address address = await _addressService.GetAddressByClientId(client.Id);
-                    CreateAddressResponse addressResponse = _mapper.Map<CreateAddressResponse>(address);
-
-                    CreateClientResponse clientResponse = _mapper.Map<CreateClientResponse>(client);
-                    clientResponse.Address = addressResponse;
-
-                    return Ok(new { Success = true, Client = clientResponse });
-                }
+                return Ok(new { Success = true, Message = EmailMsg.INF0001 }); // ToDo : Retornar Html > Login
             }
             catch (Exception ex)
             {
@@ -166,10 +131,10 @@ namespace WebLuto.Controllers
         {
             try
             {
-                List<Client> clientList = await _clientService.GetAllClients();
+                List<Client> clientList = await _clientService.GetAllClients(); // ToDo - Paginação
 
                 if (clientList == null || clientList.Count == 0)
-                    return NotFound(new { Success = false, Message = $"Não foi encontrado nenhum cliente" });
+                    return NotFound(new { Success = false, Message = ClientMsg.EXC0001 });
                 else
                 {
                     List<CreateClientResponse> clientResponseList = new List<CreateClientResponse>();
@@ -202,17 +167,16 @@ namespace WebLuto.Controllers
 
             try
             {
-                Client clientUsername = await _clientService.GetClientByEmailOrUsername(clientRequest.Username);
+                Client clientExists = await _clientService.GetClientByEmail(clientRequest.Email);
 
-                if (clientUsername != null)
-                    throw new Exception($"Já existe um cliente com o username: {clientRequest.Username}");
-
-                Client clientEmail = await _clientService.GetClientByEmailOrUsername(clientRequest.Email);
-
-                if (clientEmail != null)
-                    throw new Exception($"Já existe um cliente com o email: {clientRequest.Email}");
+                if (clientExists != null)
+                    throw new Exception(string.Format(ClientMsg.EXC0002, clientRequest.Email));
 
                 Client client = _mapper.Map<Client>(clientRequest);
+
+                if (client.Avatar != null)
+                    client.Avatar = _fileService.UploadBase64Image(client.Avatar, "images");
+
                 Client clientCreated = await _clientService.CreateClient(client);
 
                 Address address = _mapper.Map<Address>(clientRequest.Address);
@@ -229,7 +193,7 @@ namespace WebLuto.Controllers
 
                 wLTransaction.Commit();
 
-                return Ok(new { Success = true, Client = clientResponse });
+                return Ok(new { Success = true, Client = clientResponse, Message = ClientMsg.INF0001 });
             }
             catch (Exception ex)
             {
@@ -247,29 +211,29 @@ namespace WebLuto.Controllers
 
             try
             {
-                // Refresh Token
-                Client existingClient = await _clientService.GetClientByEmailOrUsername(User.Identity.Name);
+                Client existingClient = await _clientService.GetClientByEmail(User.Identity.Name);
 
                 if (existingClient == null)
-                    return NotFound(new { Success = false, Message = $"Não foi encontrado nenhum cliente" });
-
-                if (!string.IsNullOrEmpty(clientRequest.Username))
-                {
-                    Client clientUsername = await _clientService.GetClientByEmailOrUsername(clientRequest.Username);
-
-                    if (clientUsername != null)
-                        throw new Exception($"Já existe um cliente com o username: {clientRequest.Username}");
-                }
+                    return NotFound(new { Success = false, Message = ClientMsg.EXC0001 });
 
                 if (!string.IsNullOrEmpty(clientRequest.Email))
                 {
-                    Client clientEmail = await _clientService.GetClientByEmailOrUsername(clientRequest.Email);
+                    Client clientEmail = await _clientService.GetClientByEmail(clientRequest.Email);
 
                     if (clientEmail != null)
-                        throw new Exception($"Já existe um cliente com o email: {clientRequest.Email}");
+                        throw new Exception(string.Format(ClientMsg.EXC0002, clientRequest.Email));
                 }
 
                 Client clientToUpdated = _mapper.Map<Client>(clientRequest);
+
+                if (clientToUpdated.Avatar != null)
+                {
+                    if (existingClient.Avatar != null)
+                        clientToUpdated.Avatar = _fileService.UpdateImageStorage(existingClient.Avatar, clientToUpdated.Avatar, "images");
+                    else
+                        clientToUpdated.Avatar = _fileService.UploadBase64Image(clientToUpdated.Avatar, "images");
+                }
+
                 Client clientUpdated = await _clientService.UpdateClient(clientToUpdated, existingClient);
 
                 Address existingAddress = await _addressService.GetAddressByClientId(existingClient.Id);
@@ -287,7 +251,7 @@ namespace WebLuto.Controllers
 
                 wLTransaction.Commit();
 
-                return Ok(new { Success = true, Client = clientResponse });
+                return Ok(new { Success = true, Client = clientResponse, Message = ClientMsg.INF0002 });
             }
             catch (Exception ex)
             {
@@ -305,26 +269,25 @@ namespace WebLuto.Controllers
 
             try
             {
-                Client existingClient = await _clientService.GetClientByEmailOrUsername(User.Identity.Name);
+                Client existingClient = await _clientService.GetClientByEmail(User.Identity.Name);
 
                 if (existingClient == null)
-                    return NotFound(new { Success = false, Message = $"Não foi encontrado nenhum cliente!" });
+                    return NotFound(new { Success = false, Message = ClientMsg.EXC0001 });
 
-                bool successDeletedClient = await _clientService.DeleteClient(existingClient);
+                await _clientService.DeleteClient(existingClient);
 
-                if (successDeletedClient)
-                {
-                    Address address = await _addressService.GetAddressByClientId(existingClient.Id);
+                Address address = await _addressService.GetAddressByClientId(existingClient.Id);
+
+                if (address != null)
                     _addressService.DeleteAddress(address);
 
-                    wLTransaction.Commit();
+                // if (existingClient.Avatar != null) _fileService.DeleteImageStorage(existingClient.Avatar, "images");
 
-                    _emailService.SendEmail(existingClient, EmailTemplateType.AccountDeletion);
+                wLTransaction.Commit();
 
-                    return Ok(new { Success = true, Message = $"Cliente {existingClient.Username} excluído com sucesso!" });
-                }
-                else
-                    return BadRequest(new { Success = false, Message = $"Erro ao excluir o cliente {existingClient.Username}!" });
+                _emailService.SendEmail(existingClient, EmailTemplateType.AccountDeletion);
+
+                return Ok(new { Success = true, Message = ClientMsg.INF0003 });
             }
             catch (Exception ex)
             {

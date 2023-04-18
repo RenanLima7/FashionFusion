@@ -5,9 +5,7 @@
         public long Id { get; set; }
 
         public string Email { get; set; }
-
-        public string Username { get; set; }
-
+        
         public bool IsConfirmed { get; set; }
 
         public string FirstName { get; set; }

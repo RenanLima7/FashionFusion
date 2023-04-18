@@ -94,11 +94,8 @@ namespace WebLuto
 
             var app = builder.Build();
 
-            //if (app.Environment.IsDevelopment())
-            {
-                app.UseSwagger();
-                app.UseSwaggerUI();
-            }
+            app.UseSwagger();
+            app.UseSwaggerUI();
 
             app.UseHttpsRedirection();
 
@@ -141,6 +138,8 @@ namespace WebLuto
             builder.Services.AddScoped<ITokenService, TokenService>();
 
             builder.Services.AddScoped<IEmailService, EmailService>();
+
+            builder.Services.AddScoped<IFileService, FileService>();
         }
     }
 }

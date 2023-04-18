@@ -37,11 +37,11 @@ namespace WebLuto.Services
             }
         }
 
-        public async Task<Client> GetClientByEmailOrUsername(string emailOrUsername)
+        public async Task<Client> GetClientByEmail(string email)
         {
             try
             {
-                return await _clientRepository.GetClientByEmailOrUsername(emailOrUsername);
+                return await _clientRepository.GetClientByEmail(email);
             }
             catch (Exception ex)
             {
@@ -84,19 +84,6 @@ namespace WebLuto.Services
             {
                 throw new Exception(ex.Message);
             }
-        }
-
-        public async void ExistsClientWithUsernameOrEmail(string username, string email)
-        {
-            Client clientUsername = await GetClientByEmailOrUsername(username);
-
-            if (clientUsername != null)
-                throw new Exception($"Já existe um cliente com o username: {username}");
-
-            Client clientEmail = await GetClientByEmailOrUsername(email);
-
-            if (clientEmail != null)
-                throw new Exception($"Já existe um cliente com o email: {email}");
         }
 
         public void UpdateIsConfirmed(Client client, bool isConfirmed)

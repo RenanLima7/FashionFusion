@@ -5,6 +5,7 @@ using WebLuto.Models.Enums;
 using WebLuto.Security;
 using WebLuto.Services.Interfaces;
 using WebLuto.Utils;
+using WebLuto.Utils.Messages;
 
 namespace WebLuto.Services
 {
@@ -12,37 +13,46 @@ namespace WebLuto.Services
     {
         public void SendEmail(Client client, EmailTemplateType emailTemplateType, string token = null)
         {
-            Settings settings = new Settings();
-            string emailDestination = client.Email;
-            string clientName = client.FirstName + " " + client.LastName;
+            try
+            {
+                Settings settings = new Settings();
+                string emailDestination = client.Email;
+                string clientName = client.FirstName + " " + client.LastName;
 
-            MailMessage mailMessage = new MailMessage();
-            mailMessage.From = new MailAddress(new Settings().EmailContact);
-            mailMessage.To.Add(new MailAddress(emailDestination, clientName));
-            mailMessage.Subject = UtilityMethods.GetEnumDescription(emailTemplateType);
-            mailMessage.Body = GetEmailTemplateType(clientName, emailTemplateType, token);
-            mailMessage.IsBodyHtml = true;
+                MailMessage mailMessage = new MailMessage();
+                mailMessage.From = new MailAddress(new Settings().EmailContact);
+                mailMessage.To.Add(new MailAddress(emailDestination, clientName));
+                mailMessage.Subject = UtilityMethods.GetEnumDescription(emailTemplateType);
+                mailMessage.Body = GetEmailTemplateType(clientName, emailTemplateType, token);
+                mailMessage.IsBodyHtml = true;
 
-            SmtpClient smtp = new SmtpClient();
-            smtp.Host = "smtp.gmail.com";
-            smtp.Port = 587;
-            smtp.UseDefaultCredentials = false;
-            smtp.Credentials = new NetworkCredential(settings.EmailContact, settings.EmailPassword);
-            smtp.EnableSsl = true;
+                SmtpClient smtp = new SmtpClient();
+                smtp.Host = "smtp.gmail.com";
+                smtp.Port = 587;
+                smtp.UseDefaultCredentials = false;
+                smtp.Credentials = new NetworkCredential(settings.EmailContact, settings.EmailPassword);
+                smtp.EnableSsl = true;
 
-            smtp.Send(mailMessage);
+                smtp.Send(mailMessage);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(string.Format(EmailMsg.EXC0003, ex.Message));
+            }
         }
 
         public string GetEmailTemplateType(string clientName, EmailTemplateType templateType, string token = null)
         {
-            string emailBody;
-            string title = UtilityMethods.GetEnumDescription(templateType);
-            string confirmationLink = new Settings().DefaultUrlApi + "api/confirmAccount/" + token;
-
-            switch (templateType)
+            try
             {
-                case EmailTemplateType.AccountCreation:
-                    emailBody = $@"
+                string emailBody;
+                string title = UtilityMethods.GetEnumDescription(templateType);
+                string confirmationLink = new Settings().DefaultUrlApi + "api/confirmAccount/" + token;
+
+                switch (templateType)
+                {
+                    case EmailTemplateType.AccountCreation:
+                        emailBody = $@"
                         <html>
                           <head>
                             <title>{title}</title>
@@ -55,10 +65,10 @@ namespace WebLuto.Services
                             <p>Obrigado!</p>
                           </body>
                         </html>";
-                    break;
+                        break;
 
-                case EmailTemplateType.AccountDeletion:
-                    emailBody = $@"
+                    case EmailTemplateType.AccountDeletion:
+                        emailBody = $@"
                         <html>
                           <head>
                             <title>{title}</title>
@@ -70,9 +80,9 @@ namespace WebLuto.Services
                             <p>Obrigado!</p>
                           </body>
                         </html>";
-                    break;
-                case EmailTemplateType.ChangedPassword:
-                    emailBody = $@"
+                        break;
+                    case EmailTemplateType.ChangedPassword:
+                        emailBody = $@"
                         <html>
                           <head>
                             <title>{title}</title>
@@ -84,10 +94,10 @@ namespace WebLuto.Services
                             <p>Obrigado!</p>
                           </body>
                         </html>";
-                    break;
-                case EmailTemplateType.Default:
-                default:
-                    emailBody = $@"
+                        break;
+                    case EmailTemplateType.Default:
+                    default:
+                        emailBody = $@"
                         <html>
                           <head>
                             <title>{title}</title>
@@ -97,10 +107,15 @@ namespace WebLuto.Services
                             <p>Por favor, ignore este email.</p>                            
                           </body>
                         </html>";
-                    break;
-            }
+                        break;
+                }
 
-            return emailBody;
+                return emailBody;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(string.Format(EmailMsg.EXC0004, ex.Message));
+            }
         }
     }
 }
