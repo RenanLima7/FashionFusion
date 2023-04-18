@@ -3,16 +3,17 @@ using System.Text.RegularExpressions;
 using WebLuto.Security;
 using WebLuto.Services.Interfaces;
 using WebLuto.Utils;
+using WebLuto.Utils.Messages;
 
 namespace WebLuto.Services
 {
     public class FileService : IFileService
     {
-        public string UploadBase64Image(string entityIdentifier, string base64Image, string container)
+        public string UploadBase64Image(string base64Image, string container)
         {
             try
             {
-                string fileName = UtilityMethods.GenerateRandomFileName(entityIdentifier) + ".jpg";
+                string fileName = UtilityMethods.GenerateRandomFileName();
 
                 string data = new Regex(@"^data:image\/[a-z]+;base64,").Replace(base64Image, "");
 
@@ -24,7 +25,7 @@ namespace WebLuto.Services
                 {
                     if (blobClient.Exists())
                     {
-                        fileName = UtilityMethods.GenerateRandomFileName(entityIdentifier) + ".jpg";
+                        fileName = UtilityMethods.GenerateRandomFileName();
                         blobClient = new BlobClient(new Settings().AzureStorage, container, fileName);
                     }
 
@@ -35,7 +36,7 @@ namespace WebLuto.Services
             }
             catch (Exception ex)
             {
-                throw new Exception($"Houve um erro no envio da imagem - {ex.Message}");
+                throw new Exception(string.Format(FileMsg.EXC0001, ex.Message));
             }
         }
 
@@ -58,7 +59,19 @@ namespace WebLuto.Services
             }
             catch (Exception ex)
             {
-                throw new Exception($"Houve um erro no reenvio da imagem - {ex.Message}");
+                throw new Exception(string.Format(FileMsg.EXC0002, ex.Message));
+            }
+        }
+
+        public void DeleteImageStorage(string imageUrl, string container)
+        {
+            try
+            {
+                //
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(string.Format(FileMsg.EXC0003, ex.Message));
             }
         }
     }

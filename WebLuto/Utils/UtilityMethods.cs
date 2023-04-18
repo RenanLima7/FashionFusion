@@ -39,9 +39,9 @@ namespace WebLuto.Utils
             return field.GetCustomAttribute<DescriptionAttribute>()?.Description;
         }
 
-        public static string GenerateRandomFileName(string name)
+        public static string GenerateRandomFileName()
         {
-            return name + "_" + Guid.NewGuid().ToString();
+            return Guid.NewGuid().ToString() + ".jpg";
         }
     }
 }

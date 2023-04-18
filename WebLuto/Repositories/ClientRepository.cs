@@ -4,6 +4,7 @@ using WebLuto.Models;
 using WebLuto.Repositories.Interfaces;
 using WebLuto.Security;
 using WebLuto.Utils;
+using WebLuto.Utils.Messages;
 
 namespace WebLuto.Repositories
 {
@@ -16,7 +17,7 @@ namespace WebLuto.Repositories
             _dbContext = wLContext;
         }
 
-        public async Task<List<Client>> GetAllClients()
+        public async Task<List<Client>> GetAllClients() // ToDo: Paginação
         {
             try
             {
@@ -26,7 +27,7 @@ namespace WebLuto.Repositories
             }
             catch (Exception ex)
             {
-                throw new Exception(string.Format($"Erro ao buscar todos os clientes! - {ex}"));
+                throw new Exception(string.Format(ClientMsg.EXC0003, ex.Message));
             }
         }
 
@@ -42,23 +43,22 @@ namespace WebLuto.Repositories
             }
             catch (Exception ex)
             {
-                throw new Exception(string.Format($"Erro ao buscar o cliente com o Id: {id} - {ex}"));
+                throw new Exception(string.Format(ClientMsg.EXC0004, id, ex.Message));
             }
         }
 
-        public async Task<Client> GetClientByEmailOrUsername(string emailOrUsername)
+        public async Task<Client> GetClientByEmail(string email)
         {
             try
             {
                 return await _dbContext.Client.FirstOrDefaultAsync
                 (
-                    x => (x.Email == emailOrUsername || x.Username == emailOrUsername) &&
-                    x.DeletionDate == null
+                    x => x.Email == email && x.DeletionDate == null
                 );
             }
             catch (Exception ex)
             {
-                throw new Exception(string.Format($"Erro ao buscar o cliente: {emailOrUsername} - {ex}"));
+                throw new Exception(string.Format(ClientMsg.EXC0004, email, ex.Message));
             }
         }
 
@@ -67,7 +67,6 @@ namespace WebLuto.Repositories
             try
             {
                 clientToCreate.Email = clientToCreate.Email;
-                clientToCreate.Username = clientToCreate.Username;
                 clientToCreate.Salt = UtilityMethods.GenerateSalt();
                 clientToCreate.Password = Sha512Cryptographer.Encrypt(clientToCreate.Password, clientToCreate.Salt);
 
@@ -78,7 +77,7 @@ namespace WebLuto.Repositories
                 clientToCreate.BirthDate = clientToCreate.BirthDate;
                 clientToCreate.Avatar = clientToCreate.Avatar;
                 clientToCreate.CreationDate = DateTime.Now;
-                clientToCreate.IsConfirmed = false;
+                clientToCreate.IsConfirmed = true;
 
                 await _dbContext.Client.AddAsync(clientToCreate);
                 await _dbContext.SaveChangesAsync();
@@ -87,7 +86,7 @@ namespace WebLuto.Repositories
             }
             catch (Exception ex)
             {
-                throw new Exception(string.Format($"Erro ao criar o cliente! - {ex}"));
+                throw new Exception(string.Format(ClientMsg.EXC0005, ex.Message));
             }
         }
 
@@ -96,14 +95,13 @@ namespace WebLuto.Repositories
             try
             {
                 existingClient.Email = clientToUpdate.Email ?? existingClient.Email;
-                existingClient.Username = clientToUpdate.Username ?? existingClient.Username;
                 existingClient.Password = clientToUpdate.Password != null ? Sha512Cryptographer.Encrypt(clientToUpdate.Password, existingClient.Salt) : existingClient.Password;
 
                 existingClient.FirstName = clientToUpdate.FirstName ?? existingClient.FirstName;
                 existingClient.LastName = clientToUpdate.LastName ?? existingClient.LastName;
                 existingClient.CPF = clientToUpdate.CPF ?? existingClient.CPF;
                 existingClient.Phone = clientToUpdate.Phone ?? existingClient.Phone;
-                existingClient.BirthDate = clientToUpdate.BirthDate ?? existingClient.BirthDate;
+                existingClient.BirthDate = clientToUpdate.BirthDate ?? existingClient.BirthDate; // ToDo - Verificar quando a data for nula
                 existingClient.Avatar = clientToUpdate.Avatar ?? existingClient.Avatar;
                 existingClient.UpdateDate = DateTime.Now;
 
@@ -114,7 +112,7 @@ namespace WebLuto.Repositories
             }
             catch (Exception ex)
             {
-                throw new Exception(string.Format($"Erro ao atualizar o cliente: {existingClient.Id} - {ex}"));
+                throw new Exception(string.Format(ClientMsg.EXC0006, ex.Message));
             }
         }
 
@@ -131,7 +129,7 @@ namespace WebLuto.Repositories
             }
             catch (Exception ex)
             {
-                throw new Exception(string.Format($"Erro ao deletar o cliente: {clientToDelete.Id} - {ex}"));
+                throw new Exception(string.Format(ClientMsg.EXC0006, ex.Message));
             }
         }
 
@@ -147,7 +145,7 @@ namespace WebLuto.Repositories
             }
             catch (Exception ex)
             {
-                throw new Exception(string.Format($"Erro ao confirmar a conta do cliente: {client.Id} - {ex}"));
+                throw new Exception(string.Format(ClientMsg.EXC0007, ex.Message));
             }
         }
     }

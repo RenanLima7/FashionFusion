@@ -59,7 +59,7 @@
         {
             get
             {
-                return _configuration.GetValue<string>("AzureStorage");
+                return _configuration.GetConnectionString("AzureStorage");
             }
         }
     }
