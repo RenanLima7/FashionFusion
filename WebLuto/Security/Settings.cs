@@ -53,6 +53,14 @@
             {
                 return _configuration.GetValue<string>("DefaultUrlApi");
             }
-        }               
+        }
+
+        public string AzureStorage
+        {
+            get
+            {
+                return _configuration.GetConnectionString("AzureStorage");
+            }
+        }
     }
 }

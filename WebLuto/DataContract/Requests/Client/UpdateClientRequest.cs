@@ -9,9 +9,6 @@ namespace WebLuto.DataContract.Requests
         [MaxLength(250), EmailAddress]
         public string? Email { get; set; }
 
-        [MaxLength(250)]
-        public string? Username { get; set; }
-
         [MinLength(8), PasswordPropertyText]
         public string? Password { get; set; }
 

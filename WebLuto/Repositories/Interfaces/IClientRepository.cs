@@ -8,7 +8,7 @@ namespace WebLuto.Repositories.Interfaces
 
         Task<Client> GetClientById(long id);
 
-        Task<Client> GetClientByEmailOrUsername(string emailOrUsername);
+        Task<Client> GetClientByEmail(string email);
 
         Task<Client> CreateClient(Client clientToCreate);
 
