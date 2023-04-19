@@ -12,8 +12,8 @@ using WebLuto.DataContext;
 namespace WebLuto.Migrations
 {
     [DbContext(typeof(WLContext))]
-    [Migration("20230415213120_EmailClient")]
-    partial class EmailClient
+    [Migration("20230419021953_ReuploadDatabase")]
+    partial class ReuploadDatabase
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -128,11 +128,6 @@ namespace WebLuto.Migrations
 
                     b.Property<DateTime?>("UpdateDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<string>("Username")
-                        .IsRequired()
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
 
                     b.HasKey("Id");
 
