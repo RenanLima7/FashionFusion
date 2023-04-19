@@ -10,6 +10,6 @@
 
         public string LastName { get; set; }
 
-        public string CPF { get; set; }                
+        public string Avatar { get; set; }                
     }
 }

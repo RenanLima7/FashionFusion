@@ -6,11 +6,13 @@ namespace WebLuto.Models.Enums
     {
         [Description("WebLuto")]
         Default = 0,
-        [Description("Confirmação de Cadastro")]
-        AccountCreation = 1,
+        [Description("Confirmação de E-mail")]
+        EmailConfirmation = 1,
         [Description("Exclusão de Conta")]
         AccountDeletion = 2,
         [Description("Alteração de Senha")]
-        ChangedPassword = 3
+        ChangedPassword = 3,
+        [Description("Confirmação de Cadastro")]
+        ConfirmAccountCreation = 4
     }
 }
