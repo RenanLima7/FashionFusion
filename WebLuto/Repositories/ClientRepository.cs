@@ -77,7 +77,7 @@ namespace WebLuto.Repositories
                 clientToCreate.BirthDate = clientToCreate.BirthDate;
                 clientToCreate.Avatar = clientToCreate.Avatar;
                 clientToCreate.CreationDate = DateTime.Now;
-                clientToCreate.IsConfirmed = true;
+                clientToCreate.IsConfirmed = false;
 
                 await _dbContext.Client.AddAsync(clientToCreate);
                 await _dbContext.SaveChangesAsync();
