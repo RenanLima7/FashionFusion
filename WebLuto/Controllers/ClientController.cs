@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebLuto.DataContext;
 using WebLuto.DataContract.Requests;
@@ -16,6 +15,8 @@ namespace WebLuto.Controllers
     [ApiController]
     public class ClientController : ControllerBase
     {
+        private static object Entity;
+
         private readonly IMapper _mapper;
         private readonly IClientService _clientService;
         private readonly IAddressService _addressService;
@@ -48,12 +49,14 @@ namespace WebLuto.Controllers
                 {
                     LoginClientResponse loginResponse = _mapper.Map<LoginClientResponse>(client);
 
-                    return Ok(new { Success = true, Client = loginResponse });
+                    Entity = new { Client = loginResponse };
+
+                    return Ok(new { Success = true, Entity, Message = ApiMsg.INF0001 });
                 }
             }
             catch (Exception ex)
             {
-                return BadRequest(new { Success = false, ex.Message });
+                return BadRequest(new { Success = false, Entity = new { }, ex.Message });
             }
         }
 
@@ -81,14 +84,16 @@ namespace WebLuto.Controllers
 
                     LoginClientResponse loginResponse = _mapper.Map<LoginClientResponse>(client);
 
-                    return Ok(new { Success = true, Client = loginResponse, Token = jwtToken });
+                    Entity = new { Client = loginResponse, Token = jwtToken };
+
+                    return Ok(new { Success = true, Entity, Message = ApiMsg.INF0001 });
                 }
                 else
-                    return BadRequest(new { Success = false, Message = ApiMsg.EXC0001 });
+                    return BadRequest(new { Success = false, Entity = new { }, Message = ApiMsg.EXC0001 });
             }
             catch (Exception ex)
             {
-                return BadRequest(new { Success = false, ex.Message });
+                return BadRequest(new { Success = false, Entity = new { }, ex.Message });
             }
         }
 
@@ -105,22 +110,24 @@ namespace WebLuto.Controllers
                 Client client = await _clientService.GetClientById(userId);
 
                 if (client == null)
-                    return NotFound(new { Success = false, Message = TokenMsg.EXC0001 });
+                    return NotFound(new { Success = false, Entity = new { }, Message = TokenMsg.EXC0001 });
 
                 bool isConfirmed = _clientService.VerifyIsConfirmed(client);
 
                 if (isConfirmed)
-                    return Ok(new { Success = true, Message = EmailMsg.EXC0002 });
+                    return Ok(new { Success = true, Entity = new { }, Message = EmailMsg.EXC0002 });
                 else
                     _clientService.UpdateIsConfirmed(client, isConfirmed: true);
 
                 _tokenService.ExpireToken(token); // ToDo : Verificar Expiração
 
-                return Ok(new { Success = true, Message = EmailMsg.INF0001 }); // ToDo : Retornar Html > Login
+                string confirmationHTML = _emailService.GetEmailTemplateType(client.FirstName, EmailTemplateType.ConfirmAccountCreation);
+
+                return Ok(confirmationHTML);
             }
             catch (Exception ex)
             {
-                return BadRequest(new { Success = false, ex.Message });
+                return BadRequest(new { Success = false, Entity = new { }, ex.Message });
             }
         }
 
@@ -134,7 +141,7 @@ namespace WebLuto.Controllers
                 List<Client> clientList = await _clientService.GetAllClients(); // ToDo - Paginação
 
                 if (clientList == null || clientList.Count == 0)
-                    return NotFound(new { Success = false, Message = ClientMsg.EXC0001 });
+                    return NotFound(new { Success = false, Entity = new { }, Message = ClientMsg.EXC0001 });
                 else
                 {
                     List<CreateClientResponse> clientResponseList = new List<CreateClientResponse>();
@@ -150,12 +157,14 @@ namespace WebLuto.Controllers
                         clientResponseList.Add(clientResponse);
                     }
 
-                    return Ok(new { Success = true, ClientList = clientResponseList });
+                    Entity = new { ClientList = clientResponseList };
+
+                    return Ok(new { Success = true, Entity, Message = ApiMsg.INF0002 });
                 }
             }
             catch (Exception ex)
             {
-                return BadRequest(new { Success = false, ex.Message });
+                return BadRequest(new { Success = false, Entity = new { }, ex.Message });
             }
         }
 
@@ -170,7 +179,7 @@ namespace WebLuto.Controllers
                 Client clientExists = await _clientService.GetClientByEmail(clientRequest.Email);
 
                 if (clientExists != null)
-                    throw new Exception(string.Format(ClientMsg.EXC0002, clientRequest.Email));
+                    return Conflict(new { Success = false, Entity = new { }, Message = string.Format(ClientMsg.EXC0002, clientRequest.Email) });
 
                 Client client = _mapper.Map<Client>(clientRequest);
 
@@ -185,7 +194,7 @@ namespace WebLuto.Controllers
 
                 string jwtToken = _tokenService.GenerateToken(clientCreated);
 
-                _emailService.SendEmail(clientCreated, EmailTemplateType.AccountCreation, jwtToken);
+                _emailService.SendEmail(clientCreated, EmailTemplateType.EmailConfirmation, jwtToken);
 
                 CreateClientResponse clientResponse = _mapper.Map<CreateClientResponse>(clientCreated);
                 CreateAddressResponse addressResponse = _mapper.Map<CreateAddressResponse>(addressCreated);
@@ -193,12 +202,14 @@ namespace WebLuto.Controllers
 
                 wLTransaction.Commit();
 
-                return Ok(new { Success = true, Client = clientResponse, Message = ClientMsg.INF0001 });
+                Entity = new { Client = clientResponse };
+
+                return Ok(new { Success = true, Entity, Message = ClientMsg.INF0001 });
             }
             catch (Exception ex)
             {
                 wLTransaction.Rollback();
-                return BadRequest(new { Success = false, ex.Message });
+                return BadRequest(new { Success = false, Entity = new { }, ex.Message });
             }
         }
 
@@ -214,14 +225,14 @@ namespace WebLuto.Controllers
                 Client existingClient = await _clientService.GetClientByEmail(User.Identity.Name);
 
                 if (existingClient == null)
-                    return NotFound(new { Success = false, Message = ClientMsg.EXC0001 });
+                    return NotFound(new { Success = false, Entity = new { }, Message = ClientMsg.EXC0001 });
 
                 if (!string.IsNullOrEmpty(clientRequest.Email))
                 {
                     Client clientEmail = await _clientService.GetClientByEmail(clientRequest.Email);
 
                     if (clientEmail != null)
-                        throw new Exception(string.Format(ClientMsg.EXC0002, clientRequest.Email));
+                        return Conflict(new { Success = false, Entity = new { }, Message = string.Format(ClientMsg.EXC0002, clientRequest.Email) });
                 }
 
                 Client clientToUpdated = _mapper.Map<Client>(clientRequest);
@@ -251,12 +262,14 @@ namespace WebLuto.Controllers
 
                 wLTransaction.Commit();
 
-                return Ok(new { Success = true, Client = clientResponse, Message = ClientMsg.INF0002 });
+                Entity = new { Client = clientResponse };
+
+                return Ok(new { Success = true, Entity, Message = ClientMsg.INF0002 });
             }
             catch (Exception ex)
             {
                 wLTransaction.Rollback();
-                return BadRequest(new { Success = false, ex.Message });
+                return BadRequest(new { Success = false, Entity = new { }, ex.Message });
             }
         }
 
@@ -272,7 +285,7 @@ namespace WebLuto.Controllers
                 Client existingClient = await _clientService.GetClientByEmail(User.Identity.Name);
 
                 if (existingClient == null)
-                    return NotFound(new { Success = false, Message = ClientMsg.EXC0001 });
+                    return NotFound(new { Success = false, Entity = new { }, Message = ClientMsg.EXC0001 });
 
                 await _clientService.DeleteClient(existingClient);
 
@@ -287,12 +300,12 @@ namespace WebLuto.Controllers
 
                 _emailService.SendEmail(existingClient, EmailTemplateType.AccountDeletion);
 
-                return Ok(new { Success = true, Message = ClientMsg.INF0003 });
+                return Ok(new { Success = true, Entity = new { }, Message = ClientMsg.INF0003 });
             }
             catch (Exception ex)
             {
                 wLTransaction.Rollback();
-                return BadRequest(new { Success = false, ex.Message });
+                return BadRequest(new { Success = false, Entity = new { }, ex.Message });
             }
         }
     }
