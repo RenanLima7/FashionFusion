@@ -52,7 +52,60 @@ namespace WebLuto.Services
                 switch (templateType)
                 {
                     case EmailTemplateType.EmailConfirmation:
-                        emailBody = $@"";
+                        emailBody = $@"
+                        <!DOCTYPE html>
+                        <html>
+                          <head>
+                            <meta charset=""utf-8"">
+                            <title>{title}</title>
+                            <!-- Inclusão da biblioteca Tailwind CSS -->
+                            <link href=""https://cdn.jsdelivr.net/npm/tailwindcss@2.2.7/dist/tailwind.min.css"" rel=""stylesheet"">
+                            <style>
+                              /* Estilos personalizados */
+                              .brand-color {{
+                                color: #FFFFFF;
+                              }}
+                              .gradient-bg {{
+                                background: linear-gradient(90deg, #1A202C 0%, #4A5568 100%);
+                              }}
+                              .confirmation-icon {{
+                                background: #FFFFFF;
+                                color: #4A5568;
+                              }}
+                              .confirmation-icon svg {{
+                                width: 3rem;
+                                height: 3rem;
+                              }}
+                              .text-gradient {{
+                                background: -webkit-linear-gradient(#718096, #1A202C);
+                                -webkit-background-clip: text;
+                                -webkit-text-fill-color: transparent;
+                              }}
+                              .button:focus {{
+                                outline: none !important;
+                                box-shadow: none !important;
+                              }}
+                            </style>
+                          </head>
+                          <body class=""bg-gray-900"">
+                            <div class=""h-screen flex flex-col justify-center items-center"">
+                              <div class=""w-full max-w-md p-8 rounded-lg shadow-lg bg-gray-800"">
+                                <div class=""flex items-center justify-center confirmation-icon mx-auto rounded-full w-16 h-16 mb-8"">
+                                  <svg xmlns=""http://www.w3.org/2000/svg"" viewBox=""0 0 20 20"" fill=""currentColor"">
+                                    <path fill-rule=""evenodd"" d=""M18.707,4.293c0.391,0.391,0.391,1.023,0,1.414L8.414,16H7V14.586l9.293-9.293 C17.488,3.902,18.319,3.902,18.707,4.293z M10,0C4.477,0,0,4.477,0,10s4.477,10,10,10s10-4.477,10-10S15.523,0,10,0z""/>
+                                  </svg>
+                                </div>
+                                <h1 class=""text-4xl text-center font-bold text-gray-100 mb-4"">Confirmação de e-mail</h1>
+                                <p class=""text-lg text-center text-gray-100 mb-6"">Olá, {clientName}! Seu e-mail foi confirmado com sucesso.</p>
+                                <p class=""text-md text-center text-gray-400 mb-8"">Obrigado por confirmar seu e-mail. Sua conta agora está totalmente ativada.</p>
+                                <div class=""flex justify-center"">
+                                  <a href=""https://web-luto.vercel.app/"" class=""button bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-full"">Ir para a página inicial</a>
+                                </div>
+                              </div>
+                              <p class=""text-md text-gray-500 mt-8"">&copy; 2023 Web Luto. Todos os direitos reservados.</p>
+                            </div>
+                          </body>
+                        </html>";
                         break;
 
                     case EmailTemplateType.AccountDeletion:
