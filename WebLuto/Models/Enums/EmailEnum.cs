@@ -13,6 +13,8 @@ namespace WebLuto.Models.Enums
         [Description("Alteração de Senha")]
         ChangedPassword = 3,
         [Description("Confirmação de Cadastro")]
-        ConfirmAccountCreation = 4
+        ConfirmAccountCreation = 4,
+        [Description("Atualização de Conta")]
+        AccountUpdate = 5
     }
 }
