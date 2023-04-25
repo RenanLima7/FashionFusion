@@ -95,11 +95,11 @@ namespace WebLuto.Services
                                     <path fill-rule=""evenodd"" d=""M18.707,4.293c0.391,0.391,0.391,1.023,0,1.414L8.414,16H7V14.586l9.293-9.293 C17.488,3.902,18.319,3.902,18.707,4.293z M10,0C4.477,0,0,4.477,0,10s4.477,10,10,10s10-4.477,10-10S15.523,0,10,0z""/>
                                   </svg>
                                 </div>
-                                <h1 class=""text-4xl text-center font-bold text-gray-100 mb-4"">Confirmação de e-mail</h1>
-                                <p class=""text-lg text-center text-gray-100 mb-6"">Olá, {clientName}! Seu e-mail foi confirmado com sucesso.</p>
-                                <p class=""text-md text-center text-gray-400 mb-8"">Obrigado por confirmar seu e-mail. Sua conta agora está totalmente ativada.</p>
+                                <h1 class=""text-4xl text-center font-bold text-gray-100 mb-4"">Confirmação de E-mail</h1>
+                                <p class=""text-lg text-center text-gray-100 mb-6"">Obrigado por se cadastrar em nosso site!</p>
+                                <p class=""text-md text-center text-gray-400 mb-8"">Para confirmar seu E-mail, clique no botão abaixo:</p>
                                 <div class=""flex justify-center"">
-                                  <a href=""https://web-luto.vercel.app/"" class=""button bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-full"">Ir para a página inicial</a>
+                                  <a href=""{confirmationLink}"" class=""button bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-full"">Confirmar E-mail</a>
                                 </div>
                               </div>
                               <p class=""text-md text-gray-500 mt-8"">&copy; 2023 Web Luto. Todos os direitos reservados.</p>
