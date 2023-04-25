@@ -182,7 +182,7 @@ namespace WebLuto.Controllers
             {
                 Client clientExists = await _clientService.GetClientByEmail(clientRequest.Email);
 
-                if (clientExists != null)
+                if (clientExists != null && clientExists.IsConfirmed)
                     return Conflict(new { Success = false, Entity = new { }, Message = string.Format(ClientMsg.EXC0002, clientRequest.Email) });
 
                 Client client = _mapper.Map<Client>(clientRequest);
