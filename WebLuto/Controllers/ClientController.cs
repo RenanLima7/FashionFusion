@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json.Linq;
 using WebLuto.DataContext;
 using WebLuto.DataContract.Requests;
 using WebLuto.DataContract.Responses;
@@ -123,7 +124,10 @@ namespace WebLuto.Controllers
 
                 string confirmationHTML = _emailService.GetEmailTemplateType(client.FirstName, EmailTemplateType.ConfirmAccountCreation);
 
-                return Ok(confirmationHTML);
+                HttpResponseMessage response = new HttpResponseMessage();
+                response.Content = new StringContent(confirmationHTML, System.Text.Encoding.UTF8, "text/html");
+
+                return response;
             }
             catch (Exception ex)
             {
@@ -255,6 +259,8 @@ namespace WebLuto.Controllers
                     existingAddress = await _addressService.UpdateAddress(addressToUpdated, existingAddress);
                 }
 
+                _emailService.SendEmail(clientUpdated, EmailTemplateType.AccountUpdate);
+
                 UpdateAddressResponse addressResponse = _mapper.Map<UpdateAddressResponse>(existingAddress);
 
                 UpdateClientResponse clientResponse = _mapper.Map<UpdateClientResponse>(clientUpdated);
@@ -296,9 +302,9 @@ namespace WebLuto.Controllers
 
                 // if (existingClient.Avatar != null) _fileService.DeleteImageStorage(existingClient.Avatar, "images");
 
-                wLTransaction.Commit();
-
                 _emailService.SendEmail(existingClient, EmailTemplateType.AccountDeletion);
+
+                wLTransaction.Commit();
 
                 return Ok(new { Success = true, Entity = new { }, Message = ClientMsg.INF0003 });
             }
