@@ -16,7 +16,7 @@ namespace WebLuto.Services.Interfaces
 
         Task<bool> DeleteClient(Client clientToDelete);
 
-        void UpdateIsConfirmed(Client client, bool isConfirmed);
+        Task<bool> UpdateIsConfirmed(Client client, bool isConfirmed);
 
         bool VerifyIsConfirmed(Client client);
     }

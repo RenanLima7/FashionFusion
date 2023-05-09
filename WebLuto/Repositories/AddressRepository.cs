@@ -2,8 +2,6 @@
 using WebLuto.DataContext;
 using WebLuto.Models;
 using WebLuto.Repositories.Interfaces;
-using WebLuto.Security;
-using WebLuto.Utils;
 
 namespace WebLuto.Repositories
 {
@@ -26,9 +24,9 @@ namespace WebLuto.Repositories
                     x.DeletionDate == null
                 );
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw new Exception(string.Format($"Erro ao buscar o endereço com o Id: {id}"));
+                throw new Exception($"Erro ao buscar o endereço com o Id: {id} - {ex.Message}");
             }
         }
 
@@ -42,9 +40,9 @@ namespace WebLuto.Repositories
                     x.DeletionDate == null
                 );
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw new Exception(string.Format($"Erro ao buscar o endereço do cliente: {clientId}"));
+                throw new Exception($"Erro ao buscar o endereço do cliente: {clientId} - {ex.Message}");
             }
         }
 
@@ -64,9 +62,9 @@ namespace WebLuto.Repositories
 
                 return addressToCreate;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw new Exception(string.Format("Erro ao criar o endereço!"));
+                throw new Exception($"Erro ao criar o endereço - {ex.Message}");
             }
         }
 
@@ -85,9 +83,9 @@ namespace WebLuto.Repositories
 
                 return existingAddress;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw new Exception($"Erro ao atualizar o endereço: {existingAddress.Id}");
+                throw new Exception($"Erro ao atualizar o endereço: {existingAddress.Id} - {ex.Message}");
             }
         }
 
@@ -102,10 +100,10 @@ namespace WebLuto.Repositories
 
                 return true;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw new Exception($"Erro ao deletar o endereço: {addressToDelete.Id}");
+                throw new Exception($"Erro ao deletar o endereço: {addressToDelete.Id} - {ex.Message}");
             }
-        }        
+        }
     }
 }

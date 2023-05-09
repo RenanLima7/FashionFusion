@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using WebLuto.Data.Mapper;
+using WebLuto.DataContext.Mapper;
 using WebLuto.Models;
 using WebLuto.Security;
 
@@ -18,6 +19,7 @@ namespace WebLuto.DataContext
         public DbSet<Product> Product { get; set; }
         public DbSet<Client> Client { get; set; }
         public DbSet<Address> Address { get; set; }
+        public DbSet<ClientToken> ClientToken { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -25,6 +27,7 @@ namespace WebLuto.DataContext
             modelBuilder.ApplyConfiguration(new ProductMap());
             modelBuilder.ApplyConfiguration(new ClientMap());
             modelBuilder.ApplyConfiguration(new AddressMap());
+            modelBuilder.ApplyConfiguration(new ClientTokenMap());
 
             base.OnModelCreating(modelBuilder);
         }

@@ -10,6 +10,8 @@
 
         public string LastName { get; set; }
 
+        public bool IsConfirmed { get; set; }
+
         public string Avatar { get; set; }                
     }
 }

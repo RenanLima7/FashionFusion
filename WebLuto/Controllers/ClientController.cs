@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json.Linq;
 using WebLuto.DataContext;
 using WebLuto.DataContract.Requests;
 using WebLuto.DataContract.Responses;
@@ -72,11 +71,6 @@ namespace WebLuto.Controllers
                 if (client == null)
                     return NotFound(new { Success = false, Message = ClientMsg.EXC0001 });
 
-                bool isConfirmed = _clientService.VerifyIsConfirmed(client);
-
-                if (!isConfirmed)
-                    return Unauthorized(new { Success = false, Message = EmailMsg.EXC0001 });
-
                 bool isValidPassword = Sha512Cryptographer.Compare(loginRequest.Password, client.Salt, client.Password);
 
                 if (isValidPassword)
@@ -104,30 +98,64 @@ namespace WebLuto.Controllers
         {
             try
             {
-                _tokenService.IsValidToken("Bearer " + token);
+                ClientToken clientToken = await _tokenService.GetClientTokenByToken(token);
 
-                long userId = _tokenService.GetUserIdFromJWTToken(token);
+                if (clientToken == null)
+                    return NotFound(new { Success = false, Entity = new { }, Message = TokenMsg.EXC0001 });
 
-                Client client = await _clientService.GetClientById(userId);
+                Client client = await _clientService.GetClientById(clientToken.ClientId);
 
                 if (client == null)
-                    return NotFound(new { Success = false, Entity = new { }, Message = TokenMsg.EXC0001 });
+                    return NotFound(new { Success = false, Entity = new { }, Message = ClientMsg.EXC0001 });
 
                 bool isConfirmed = _clientService.VerifyIsConfirmed(client);
 
                 if (isConfirmed)
-                    return Ok(new { Success = true, Entity = new { }, Message = EmailMsg.EXC0002 });
+                    return Ok(new { Success = true, Entity = new { client.Email }, Message = EmailMsg.EXC0002 });
                 else
-                    _clientService.UpdateIsConfirmed(client, isConfirmed: true);
+                    await _clientService.UpdateIsConfirmed(client, isConfirmed: true);
 
-                _tokenService.ExpireToken(token); // ToDo : Verificar Expiração
+                _emailService.SendEmail(client, EmailTemplateType.ConfirmAccountCreation);
 
-                string confirmationHTML = _emailService.GetEmailTemplateType(client.FirstName, EmailTemplateType.ConfirmAccountCreation);
+                return Ok(new { Success = true, Entity = new { client.Email }, Message = EmailMsg.INF0001 });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Success = false, Entity = new { }, ex.Message });
+            }
+        }
 
-                HttpResponseMessage response = new HttpResponseMessage();
-                response.Content = new StringContent(confirmationHTML, System.Text.Encoding.UTF8, "text/html");
+        [HttpPost]
+        [Route("resendToken")]
+        [WLToken]
+        public async Task<ActionResult<dynamic>> ResendToken()
+        {
+            try
+            {                
+                Client client = await _clientService.GetClientByEmail(User.Identity.Name);
 
-                return response;
+                if (client == null)
+                    return NotFound(new { Success = false, Entity = new { }, Message = ClientMsg.EXC0001 });
+
+                bool isConfirmed = _clientService.VerifyIsConfirmed(client);
+
+                if (isConfirmed)
+                    return Ok(new { Success = true, Entity = new { client.Email }, Message = EmailMsg.EXC0002 });
+
+                string token;
+
+                ClientToken clientToken = await _tokenService.GetClientTokenByClientId(client.Id);
+                
+                if (clientToken == null)
+                    token = _tokenService.GenerateConfirmationCode(client).Result.Token;
+                else if (clientToken.CreationDate >= DateTime.UtcNow.AddMinutes(-5))
+                    token = clientToken.Token;
+                else
+                    token = _tokenService.ResendToken(clientToken).Result.Token;
+
+                _emailService.SendEmail(client, EmailTemplateType.EmailConfirmation, token);
+
+                return Ok(new { Success = true, Entity = new { client.Email }, Message = EmailMsg.INF0002 });
             }
             catch (Exception ex)
             {
@@ -196,9 +224,10 @@ namespace WebLuto.Controllers
                 address.ClientId = clientCreated.Id;
                 Address addressCreated = await _addressService.CreateAddress(address);
 
-                string jwtToken = _tokenService.GenerateToken(clientCreated);
+                ClientToken clientToken = await _tokenService.GenerateConfirmationCode(clientCreated);
+                string token = clientToken.Token;
 
-                _emailService.SendEmail(clientCreated, EmailTemplateType.EmailConfirmation, jwtToken);
+                _emailService.SendEmail(clientCreated, EmailTemplateType.EmailConfirmation, token);
 
                 CreateClientResponse clientResponse = _mapper.Map<CreateClientResponse>(clientCreated);
                 CreateAddressResponse addressResponse = _mapper.Map<CreateAddressResponse>(addressCreated);
@@ -259,7 +288,8 @@ namespace WebLuto.Controllers
                     existingAddress = await _addressService.UpdateAddress(addressToUpdated, existingAddress);
                 }
 
-                _emailService.SendEmail(clientUpdated, EmailTemplateType.AccountUpdate);
+                if (clientToUpdated.IsConfirmed)
+                    _emailService.SendEmail(clientUpdated, EmailTemplateType.AccountUpdate);
 
                 UpdateAddressResponse addressResponse = _mapper.Map<UpdateAddressResponse>(existingAddress);
 
@@ -302,7 +332,8 @@ namespace WebLuto.Controllers
 
                 // if (existingClient.Avatar != null) _fileService.DeleteImageStorage(existingClient.Avatar, "images");
 
-                _emailService.SendEmail(existingClient, EmailTemplateType.AccountDeletion);
+                if (existingClient.IsConfirmed)
+                    _emailService.SendEmail(existingClient, EmailTemplateType.AccountDeletion);
 
                 wLTransaction.Commit();
 

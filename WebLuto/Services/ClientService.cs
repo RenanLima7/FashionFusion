@@ -86,11 +86,11 @@ namespace WebLuto.Services
             }
         }
 
-        public void UpdateIsConfirmed(Client client, bool isConfirmed)
+        public async Task<bool> UpdateIsConfirmed(Client client, bool isConfirmed)
         {
             try
             {
-                _clientRepository.UpdateIsConfirmed(client, isConfirmed);
+                return await _clientRepository.UpdateIsConfirmed(client, isConfirmed);
             }
             catch (Exception ex)
             {

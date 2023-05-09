@@ -4,6 +4,8 @@ namespace WebLuto.Services.Interfaces
 {
     public interface ITokenService
     {
+        Task<ClientToken> GenerateConfirmationCode(Client client);
+
         string GenerateToken(Client client);
 
         void IsValidToken(string authorizationHeader);
@@ -13,5 +15,11 @@ namespace WebLuto.Services.Interfaces
         long GetUserIdFromJWTToken(string token);
 
         bool ExpireToken(string token);
+
+        Task<ClientToken> GetClientTokenByToken(string token);
+
+        Task<ClientToken> GetClientTokenByClientId(long id);
+
+        Task<ClientToken> ResendToken(ClientToken clientToken);
     }
 }
