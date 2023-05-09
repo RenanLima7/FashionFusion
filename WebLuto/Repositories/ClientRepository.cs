@@ -133,7 +133,7 @@ namespace WebLuto.Repositories
             }
         }
 
-        public async void UpdateIsConfirmed(Client client, bool isConfirmed)
+        public async Task<bool> UpdateIsConfirmed(Client client, bool isConfirmed)
         {
             try
             {
@@ -142,6 +142,8 @@ namespace WebLuto.Repositories
 
                 _dbContext.Client.Update(client);
                 await _dbContext.SaveChangesAsync();
+
+                return true;
             }
             catch (Exception ex)
             {

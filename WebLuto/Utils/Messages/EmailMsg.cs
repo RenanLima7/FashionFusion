@@ -15,7 +15,7 @@
         #region INFORMATIONS (INF0000)
 
         public const string INF0001 = "Email confirmado com sucesso!";
-        public const string INF0002 = "";
+        public const string INF0002 = "Um email com o código de confirmação foi enviado!";
         public const string INF0003 = "";
         public const string INF0004 = "";
 

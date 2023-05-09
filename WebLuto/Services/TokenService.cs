@@ -3,6 +3,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using WebLuto.Models;
+using WebLuto.Repositories.Interfaces;
 using WebLuto.Security;
 using WebLuto.Services.Interfaces;
 
@@ -10,7 +11,34 @@ namespace WebLuto.Services
 {
     public class TokenService : ITokenService
     {
-        public TokenService() { }
+        private readonly ITokenRepository _tokenRepository;
+
+        public TokenService(ITokenRepository tokenRepository)
+        {
+            _tokenRepository = tokenRepository;
+        }
+
+        public async Task<ClientToken> GenerateConfirmationCode(Client client)
+        {
+            try
+            {
+                string token = new Random().Next(1111, 9999).ToString();
+
+                ClientToken clientToken = new ClientToken
+                {
+                    Client = client,
+                    Token = token
+                };
+
+                await _tokenRepository.CreateClientToken(clientToken);
+
+                return clientToken;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
 
         public string GenerateToken(Client client)
         {
@@ -150,6 +178,41 @@ namespace WebLuto.Services
             {
                 return false;
             }
+        }
+
+        public async Task<ClientToken> GetClientTokenByToken(string token)
+        {
+            try
+            {
+                return await _tokenRepository.GetClientTokenByToken(token);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<ClientToken> GetClientTokenByClientId(long id)
+        {
+            try
+            {
+                return await _tokenRepository.GetClientTokenByClientId(id);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<ClientToken> ResendToken(ClientToken clientToken)
+        {
+            string token = new Random().Next(1111, 9999).ToString();
+
+            clientToken.CreationDate = DateTime.UtcNow;
+            clientToken.UpdateDate = DateTime.UtcNow;
+            clientToken.Token = token;
+
+            return await _tokenRepository.UpdateClientToken(clientToken);
         }
     }
 }
