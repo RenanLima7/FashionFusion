@@ -1,5 +1,4 @@
-﻿using Azure.Storage.Blobs;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using WebLuto.Security;
 using WebLuto.Services.Interfaces;
 using WebLuto.Utils;
@@ -19,7 +18,7 @@ namespace WebLuto.Services
 
                 byte[] imageBytes = Convert.FromBase64String(data);
 
-                BlobClient blobClient = new BlobClient(new Settings().AzureStorage, container, fileName);
+                /*BlobClient blobClient = new BlobClient(new Settings().AzureStorage, container, fileName);
 
                 using (MemoryStream stream = new MemoryStream(imageBytes))
                 {
@@ -30,9 +29,9 @@ namespace WebLuto.Services
                     }
 
                     blobClient.Upload(stream);
-                }
+                }*/
 
-                return blobClient.Uri.AbsoluteUri;
+                return " "; // blobClient.Uri.AbsoluteUri;
             }
             catch (Exception ex)
             {
@@ -48,14 +47,14 @@ namespace WebLuto.Services
                 string data = new Regex(@"^data:image\/[a-z]+;base64,").Replace(newBase64Image, "");
                 byte[] imageBytes = Convert.FromBase64String(data);
 
-                BlobClient blobClient = new BlobClient(new Settings().AzureStorage, container, blobName);
+                /*BlobClient blobClient = new BlobClient(new Settings().AzureStorage, container, blobName);
 
                 using (MemoryStream stream = new MemoryStream(imageBytes))
                 {
                     blobClient.Upload(stream, true);
-                }
+                }*/
 
-                return blobClient.Uri.AbsoluteUri;
+                return " "; // blobClient.Uri.AbsoluteUri;
             }
             catch (Exception ex)
             {

@@ -85,9 +85,9 @@ namespace WebLuto
 
             #region DataBase Connection
 
-            builder.Services.AddEntityFrameworkSqlServer()
+            builder.Services.AddEntityFrameworkNpgsql()
                 .AddDbContext<WLContext>(
-                    options => options.UseSqlServer(builder.Configuration.GetConnectionString("DataBase"))
+                    options => options.UseNpgsql(builder.Configuration.GetConnectionString("DATABASE_URL"))
                 );
 
             #endregion

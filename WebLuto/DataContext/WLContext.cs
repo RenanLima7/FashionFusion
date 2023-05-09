@@ -35,7 +35,7 @@ namespace WebLuto.DataContext
         private static DbContextOptions<WLContext> GetDefaultOptions()
         {
             var builder = new DbContextOptionsBuilder<WLContext>();
-            builder.UseSqlServer(new Settings().DataBase);
+            builder.UseNpgsql(new Settings().DataBase);
 
             return builder.Options;
         }
