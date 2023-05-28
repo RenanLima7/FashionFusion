@@ -1,20 +1,21 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using WebLuto.Common;
 using WebLuto.DataContext;
 using WebLuto.Models;
 using WebLuto.Repositories.Interfaces;
 
 namespace WebLuto.Repositories
 {
-    public class AddressRepository : IAddressRepository
+    public class AddressRepository : BaseRepository, IAddressRepository
     {
         private readonly WLContext _dbContext;
 
-        public AddressRepository(WLContext wLContext)
-        {
-            _dbContext = wLContext;
+        public AddressRepository(WLContext wLContext) : base(wLContext) 
+        { 
+            _dbContext= wLContext;
         }
 
-        public async Task<Address> GetAddressById(long id)
+        public async Task<Address> GetById(long id)
         {
             try
             {
@@ -46,7 +47,7 @@ namespace WebLuto.Repositories
             }
         }
 
-        public async Task<Address> CreateAddress(Address addressToCreate)
+        public async Task<Address> Create(Address addressToCreate)
         {
             try
             {
@@ -55,7 +56,7 @@ namespace WebLuto.Repositories
                 addressToCreate.AddressLine = addressToCreate.AddressLine;
                 addressToCreate.AddressLineNumber = addressToCreate.AddressLineNumber;
                 addressToCreate.Neighborhood = addressToCreate.Neighborhood;
-                addressToCreate.CreationDate = DateTime.Now;
+                addressToCreate.CreationDate = DateTime.UtcNow;
 
                 await _dbContext.Address.AddAsync(addressToCreate);
                 await _dbContext.SaveChangesAsync();
@@ -68,7 +69,7 @@ namespace WebLuto.Repositories
             }
         }
 
-        public async Task<Address> UpdateAddress(Address addressToUpdate, Address existingAddress)
+        public async Task<Address> Update(Address addressToUpdate, Address existingAddress)
         {
             try
             {
@@ -76,7 +77,7 @@ namespace WebLuto.Repositories
                 existingAddress.AddressLine = addressToUpdate.AddressLine ?? existingAddress.AddressLine;
                 existingAddress.AddressLineNumber = addressToUpdate.AddressLineNumber ?? existingAddress.AddressLineNumber;
                 existingAddress.Neighborhood = addressToUpdate.Neighborhood ?? existingAddress.Neighborhood;
-                existingAddress.UpdateDate = DateTime.Now;
+                existingAddress.UpdateDate = DateTime.UtcNow;
 
                 _dbContext.Address.Update(existingAddress);
                 await _dbContext.SaveChangesAsync();
@@ -89,11 +90,11 @@ namespace WebLuto.Repositories
             }
         }
 
-        public async Task<bool> DeleteAddress(Address addressToDelete)
+        public async Task<bool> Delete(Address addressToDelete)
         {
             try
             {
-                addressToDelete.DeletionDate = DateTime.Now;
+                addressToDelete.DeletionDate = DateTime.UtcNow;
 
                 _dbContext.Address.Update(addressToDelete);
                 await _dbContext.SaveChangesAsync();

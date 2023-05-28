@@ -18,7 +18,7 @@ namespace WebLuto.Repositories
         {
             try
             {
-                clientToken.CreationDate = DateTime.Now;
+                clientToken.CreationDate = DateTime.UtcNow;
 
                 await _dbContext.ClientToken.AddAsync(clientToken);
                 await _dbContext.SaveChangesAsync();

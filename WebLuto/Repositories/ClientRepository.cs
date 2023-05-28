@@ -76,7 +76,7 @@ namespace WebLuto.Repositories
                 clientToCreate.Phone = clientToCreate.Phone;
                 clientToCreate.BirthDate = clientToCreate.BirthDate;
                 clientToCreate.Avatar = clientToCreate.Avatar;
-                clientToCreate.CreationDate = DateTime.Now;
+                clientToCreate.CreationDate = DateTime.UtcNow;
                 clientToCreate.IsConfirmed = false;
 
                 await _dbContext.Client.AddAsync(clientToCreate);
@@ -103,7 +103,7 @@ namespace WebLuto.Repositories
                 existingClient.Phone = clientToUpdate.Phone ?? existingClient.Phone;
                 existingClient.BirthDate = clientToUpdate.BirthDate ?? existingClient.BirthDate; // ToDo - Verificar quando a data for nula
                 existingClient.Avatar = clientToUpdate.Avatar ?? existingClient.Avatar;
-                existingClient.UpdateDate = DateTime.Now;
+                existingClient.UpdateDate = DateTime.UtcNow;
 
                 _dbContext.Client.Update(existingClient);
                 await _dbContext.SaveChangesAsync();
@@ -120,7 +120,7 @@ namespace WebLuto.Repositories
         {
             try
             {
-                clientToDelete.DeletionDate = DateTime.Now;
+                clientToDelete.DeletionDate = DateTime.UtcNow;
 
                 _dbContext.Client.Update(clientToDelete);
                 await _dbContext.SaveChangesAsync();
@@ -138,7 +138,7 @@ namespace WebLuto.Repositories
             try
             {
                 client.IsConfirmed = isConfirmed;
-                client.UpdateDate = DateTime.Now;
+                client.UpdateDate = DateTime.UtcNow;
 
                 _dbContext.Client.Update(client);
                 await _dbContext.SaveChangesAsync();

@@ -54,7 +54,7 @@ namespace WebLuto.Repositories
                 productToCreate.Quantity = productToCreate.Quantity;
                 productToCreate.Dimension = productToCreate.Dimension;
                 productToCreate.Image = productToCreate.Image;
-                productToCreate.CreationDate = DateTime.Now;
+                productToCreate.CreationDate = DateTime.UtcNow;
 
                 await _dbContext.Product.AddAsync(productToCreate);
                 await _dbContext.SaveChangesAsync();
@@ -77,7 +77,7 @@ namespace WebLuto.Repositories
                 existingProduct.Quantity = productToUpdate.Quantity != existingProduct.Quantity ? productToUpdate.Quantity : existingProduct.Quantity;
                 existingProduct.Dimension = productToUpdate.Dimension ?? existingProduct.Dimension;
                 existingProduct.Image = productToUpdate.Image ?? existingProduct.Image;
-                existingProduct.UpdateDate = DateTime.Now;
+                existingProduct.UpdateDate = DateTime.UtcNow;
 
                 _dbContext.Product.Update(existingProduct);
                 await _dbContext.SaveChangesAsync();
@@ -96,7 +96,7 @@ namespace WebLuto.Repositories
             {
                 //_dbContext.Product.Remove(productToDelete);
 
-                productToDelete.DeletionDate = DateTime.Now;
+                productToDelete.DeletionDate = DateTime.UtcNow;
 
                 _dbContext.Product.Update(productToDelete);
                 await _dbContext.SaveChangesAsync();

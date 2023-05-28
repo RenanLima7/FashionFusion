@@ -66,7 +66,7 @@ namespace WebLuto.Repositories
         {
             try
             {
-                userToCreate.CreationDate = DateTime.Now;
+                userToCreate.CreationDate = DateTime.UtcNow;
                 userToCreate.Salt = UtilityMethods.GenerateSalt();
                 userToCreate.Password = Sha512Cryptographer.Encrypt(userToCreate.Password, userToCreate.Salt);
 
@@ -87,7 +87,7 @@ namespace WebLuto.Repositories
             {                
                 existingUser.Username = userToUpdate.Username ?? existingUser.Username;
                 existingUser.Password = userToUpdate.Password != null ? Sha512Cryptographer.Encrypt(userToUpdate.Password, existingUser.Salt) : existingUser.Password;
-                existingUser.UpdateDate = DateTime.Now;
+                existingUser.UpdateDate = DateTime.UtcNow;
 
                 _dbContext.User.Update(existingUser);
                 await _dbContext.SaveChangesAsync();
@@ -106,7 +106,7 @@ namespace WebLuto.Repositories
             {
                 //_dbContext.User.Remove(userToDelete);
 
-                userToDelete.DeletionDate = DateTime.Now;
+                userToDelete.DeletionDate = DateTime.UtcNow;
 
                 _dbContext.User.Update(userToDelete);
                 await _dbContext.SaveChangesAsync();

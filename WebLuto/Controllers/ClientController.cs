@@ -69,7 +69,7 @@ namespace WebLuto.Controllers
                 Client client = await _clientService.GetClientByEmail(loginRequest.Email);
 
                 if (client == null)
-                    return NotFound(new { Success = false, Message = ClientMsg.EXC0001 });
+                    return NotFound(new { Success = false, Entity = new { }, Message = ClientMsg.EXC0001 });
 
                 bool isValidPassword = Sha512Cryptographer.Compare(loginRequest.Password, client.Salt, client.Password);
 
@@ -215,7 +215,7 @@ namespace WebLuto.Controllers
 
                 Client client = _mapper.Map<Client>(clientRequest);
 
-                if (client.Avatar != null)
+                if (!string.IsNullOrEmpty(client.Avatar))
                     client.Avatar = _fileService.UploadBase64Image(client.Avatar, "images");
 
                 Client clientCreated = await _clientService.CreateClient(client);
