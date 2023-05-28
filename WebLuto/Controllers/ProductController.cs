@@ -29,7 +29,7 @@ namespace WebLuto.Controllers
         {
             try
             {
-                Product product = await _productService.GetProductById(productId);
+                Product product = await _productService.GetByIdAsync<Product>(productId);
 
                 if (product == null)
                     return NotFound(new { Success = false, Message = $"Não foi encontrado nenhum produto com o Id: {productId}" });
@@ -52,9 +52,9 @@ namespace WebLuto.Controllers
         {
             try
             {
-                List<Product> productList = await _productService.GetAllProducts();
+                IEnumerable<Product> productList = await _productService.GetAllAsync<Product>();
 
-                if (productList == null || productList.Count == 0)
+                if (!productList.Any())
                     return NotFound(new { Success = false, Message = $"Não foi encontrado nenhum produto" });
                 else
                 {
@@ -82,7 +82,7 @@ namespace WebLuto.Controllers
             {
                 Product product = _mapper.Map<Product>(productRequest);
 
-                Product productCreated = await _productService.CreateProduct(product);
+                Product productCreated = await _productService.Create(product);
 
                 CreateProductResponse productResponse = _mapper.Map<CreateProductResponse>(productCreated);
 
@@ -101,14 +101,14 @@ namespace WebLuto.Controllers
         {
             try
             {
-                Product existingProduct = await _productService.GetProductById(id);
+                Product existingProduct = await _productService.GetByIdAsync<Product>(id);
 
                 if (existingProduct == null)
                     return NotFound(new { Success = false, Message = $"Não foi encontrado nenhum produto com o Id: {id}" });
 
-                Product productToUpdated = _mapper.Map<Product>(productRequest);
+                existingProduct = _mapper.Map<Product>(productRequest);
 
-                Product productUpdated = await _productService.UpdateProduct(productToUpdated, existingProduct);
+                Product productUpdated = await _productService.Update(existingProduct);
 
                 UpdateProductResponse productResponse = _mapper.Map<UpdateProductResponse>(productUpdated);
 
@@ -126,12 +126,12 @@ namespace WebLuto.Controllers
         {
             try
             {
-                Product existingProduct = await _productService.GetProductById(id);
+                Product existingProduct = await _productService.GetByIdAsync<Product>(id);
 
                 if (existingProduct == null)
                     return NotFound(new { Success = false, Message = $"Não foi encontrado nenhum produto com o Id: {id}" });
 
-                bool successDeletedProduct = await _productService.DeleteProduct(existingProduct);
+                bool successDeletedProduct = await _productService.Delete(existingProduct);
 
                 if (successDeletedProduct)
                     return Ok(new { Success = true, Product = $"Produto {existingProduct.Id} excluído com sucesso!" });

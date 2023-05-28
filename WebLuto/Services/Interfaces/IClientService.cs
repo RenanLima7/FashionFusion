@@ -1,20 +1,11 @@
-﻿using WebLuto.Models;
+﻿using WebLuto.Common.Interfaces;
+using WebLuto.Models;
 
 namespace WebLuto.Services.Interfaces
 {
-    public interface IClientService
+    public interface IClientService : IBaseService
     {
-        Task<List<Client>> GetAllClients();
-
-        Task<Client> GetClientById(long id);
-
         Task<Client> GetClientByEmail(string email);
-
-        Task<Client> CreateClient(Client clientToCreate);
-
-        Task<Client> UpdateClient(Client clientToUpdate, Client existingClient);
-
-        Task<bool> DeleteClient(Client clientToDelete);
 
         Task<bool> UpdateIsConfirmed(Client client, bool isConfirmed);
 

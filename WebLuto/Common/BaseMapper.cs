@@ -14,7 +14,6 @@ namespace WebLuto.Common
             builder.Property(x => x.Id).ValueGeneratedOnAdd();
             builder.Property(x => x.CreationDate).IsRequired();
             builder.Property(x => x.UpdateDate);
-            builder.Property(x => x.DeletionDate);
         }
     }
 }

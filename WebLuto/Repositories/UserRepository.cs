@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using WebLuto.Common.Repository;
 using WebLuto.DataContext;
 using WebLuto.Models;
 using WebLuto.Repositories.Interfaces;
@@ -7,54 +8,20 @@ using WebLuto.Utils;
 
 namespace WebLuto.Repositories
 {
-    public class UserRepository : IUserRepository
+    public class UserRepository : BaseRepository, IUserRepository
     {
         private readonly WLContext _dbContext;
 
-        public UserRepository(WLContext wLContext)
+        public UserRepository(WLContext wLContext) : base(wLContext)
         {
             _dbContext = wLContext;
-        }
-
-        public async Task<List<User>> GetAllUsers()
-        {
-            try
-            {
-                return await _dbContext.User
-                    .Where(x => x.DeletionDate == null)
-                    .ToListAsync();
-            }
-            catch (Exception)
-            {
-                throw new Exception(string.Format("Erro ao buscar todos os usuários!"));
-            }
-        }
-
-        public async Task<User> GetUserById(long id)
-        {
-            try
-            {
-                return await _dbContext.User.FirstOrDefaultAsync
-                (
-                    x => x.Id == id &&
-                    x.DeletionDate == null
-                );
-            }
-            catch (Exception)
-            {
-                throw new Exception(string.Format("Erro ao buscar um usuário com o Id: {0}", id));
-            }
         }
 
         public async Task<User> GetUserByUsername(string username)
         {
             try
             {
-                return await _dbContext.User.FirstOrDefaultAsync
-                (
-                    x => x.Username == username &&
-                    x.DeletionDate == null
-                );
+                return await _dbContext.User.FirstOrDefaultAsync(x => x.Username == username);
             }
             catch (Exception)
             {
@@ -78,44 +45,6 @@ namespace WebLuto.Repositories
             catch (Exception)
             {
                 throw new Exception(string.Format("Erro ao criar o usuário!"));
-            }
-        }
-
-        public async Task<User> UpdateUser(User userToUpdate, User existingUser)
-        {
-            try
-            {                
-                existingUser.Username = userToUpdate.Username ?? existingUser.Username;
-                existingUser.Password = userToUpdate.Password != null ? Sha512Cryptographer.Encrypt(userToUpdate.Password, existingUser.Salt) : existingUser.Password;
-                existingUser.UpdateDate = DateTime.UtcNow;
-
-                _dbContext.User.Update(existingUser);
-                await _dbContext.SaveChangesAsync();
-
-                return existingUser;
-            }
-            catch (Exception)
-            {
-                throw new Exception(string.Format("Erro ao atualizar o usuário: {0}", existingUser.Id));
-            }
-        }
-
-        public async Task<bool> DeleteUser(User userToDelete) 
-        {
-            try
-            {
-                //_dbContext.User.Remove(userToDelete);
-
-                userToDelete.DeletionDate = DateTime.UtcNow;
-
-                _dbContext.User.Update(userToDelete);
-                await _dbContext.SaveChangesAsync();
-
-                return true;
-            }
-            catch (Exception)
-            {
-                throw new Exception(string.Format("Erro ao deletar o usuário: {0}", userToDelete.Id));
             }
         }
     }

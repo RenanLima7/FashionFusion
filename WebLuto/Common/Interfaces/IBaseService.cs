@@ -2,14 +2,14 @@
 {
     public interface IBaseService
     {
-        public void Create<T>(T entity) where T : class;
+        public Task<IEnumerable<T>> GetAllAsync<T>() where T : class;
 
-        public void Update<T>(T entity) where T : class;
+        public Task<T> GetByIdAsync<T>(long id) where T : class;
 
-        public void Delete<T>(T entity) where T : class;
+        public Task<T> Create<T>(T entity) where T : class;
 
-        public IEnumerable<T> GetAll<T>() where T : class;
+        public Task<T> Update<T>(T entity) where T : class;
 
-        public T GetById<T>(long id) where T : class;
+        public Task<bool> Delete<T>(T entity) where T : class;
     }
 }

@@ -1,4 +1,5 @@
-﻿using WebLuto.Common.Interfaces;
+﻿using Microsoft.EntityFrameworkCore;
+using WebLuto.Common.Interfaces;
 using WebLuto.DataContext;
 
 namespace WebLuto.Common.Repository
@@ -12,34 +13,73 @@ namespace WebLuto.Common.Repository
             _dbContext = wLContext;
         }
 
-        public IEnumerable<T> GetAll<T>() where T : class
+        public async Task<IEnumerable<T>> GetAllAsync<T>() where T : class
         {
-            throw new NotImplementedException();
+            try
+            {
+                return await _dbContext.Set<T>().ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Erro ao buscar tudo - {ex.Message}");
+            }
         }
 
-        public T GetById<T>(long id) where T : class
+        public async Task<T> GetByIdAsync<T>(long id) where T : class
         {
-            throw new NotImplementedException();
+            try
+            {
+                return await _dbContext.Set<T>().FindAsync(id);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Erro ao buscar o id {id} - {ex.Message}");
+            }
         }
 
-        public void Create<T>(T entity) where T : class
+        public async Task<T> Create<T>(T entity) where T : class
         {
-            throw new NotImplementedException();
+            try
+            {
+                await _dbContext.AddAsync(entity);
+                await _dbContext.SaveChangesAsync();
+
+                return entity;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Erro ao criar - {ex.Message}");
+            }
         }
 
-        public void Update<T>(T entity) where T : class
+        public async Task<T> Update<T>(T entity) where T : class
         {
-            throw new NotImplementedException();
+            try
+            {
+                _dbContext.Update(entity);
+                await _dbContext.SaveChangesAsync();
+
+                return entity;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Erro ao atualizar - {ex.Message}");
+            }
         }
 
-        public void Delete<T>(T entity) where T : class
+        public async Task<bool> Delete<T>(T entity) where T : class
         {
-            throw new NotImplementedException();
-        }
+            try
+            {
+                _dbContext.Remove(entity);
+                await _dbContext.SaveChangesAsync();
 
-        public bool SaveChanges()
-        {
-            throw new NotImplementedException();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Erro ao deletar - {ex.Message}");
+            }
         }
     }
 }

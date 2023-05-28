@@ -27,10 +27,11 @@ namespace WebLuto.Services
                 ClientToken clientToken = new ClientToken
                 {
                     Client = client,
-                    Token = token
+                    Token = token,
+                    CreationDate= DateTime.Now
                 };
 
-                await _tokenRepository.CreateClientToken(clientToken);
+                await _tokenRepository.Create(clientToken);
 
                 return clientToken;
             }
@@ -212,7 +213,7 @@ namespace WebLuto.Services
             clientToken.UpdateDate = DateTime.UtcNow;
             clientToken.Token = token;
 
-            return await _tokenRepository.UpdateClientToken(clientToken);
+            return await _tokenRepository.Update(clientToken);
         }
     }
 }

@@ -103,7 +103,7 @@ namespace WebLuto.Controllers
                 if (clientToken == null)
                     return NotFound(new { Success = false, Entity = new { }, Message = TokenMsg.EXC0001 });
 
-                Client client = await _clientService.GetClientById(clientToken.ClientId);
+                Client client = await _clientService.GetByIdAsync<Client>(clientToken.ClientId);
 
                 if (client == null)
                     return NotFound(new { Success = false, Entity = new { }, Message = ClientMsg.EXC0001 });
@@ -131,7 +131,7 @@ namespace WebLuto.Controllers
         public async Task<ActionResult<dynamic>> ResendToken()
         {
             try
-            {                
+            {
                 Client client = await _clientService.GetClientByEmail(User.Identity.Name);
 
                 if (client == null)
@@ -145,7 +145,7 @@ namespace WebLuto.Controllers
                 string token;
 
                 ClientToken clientToken = await _tokenService.GetClientTokenByClientId(client.Id);
-                
+
                 if (clientToken == null)
                     token = _tokenService.GenerateConfirmationCode(client).Result.Token;
                 else if (clientToken.CreationDate >= DateTime.UtcNow.AddMinutes(-5))
@@ -170,9 +170,9 @@ namespace WebLuto.Controllers
         {
             try
             {
-                List<Client> clientList = await _clientService.GetAllClients(); // ToDo - Paginação
+                IEnumerable<Client> clientList = await _clientService.GetAllAsync<Client>(); // ToDo - Paginação
 
-                if (clientList == null || clientList.Count == 0)
+                if (!clientList.Any())
                     return NotFound(new { Success = false, Entity = new { }, Message = ClientMsg.EXC0001 });
                 else
                 {
@@ -218,11 +218,11 @@ namespace WebLuto.Controllers
                 if (!string.IsNullOrEmpty(client.Avatar))
                     client.Avatar = _fileService.UploadBase64Image(client.Avatar, "images");
 
-                Client clientCreated = await _clientService.CreateClient(client);
+                Client clientCreated = await _clientService.Create(client);
 
                 Address address = _mapper.Map<Address>(clientRequest.Address);
                 address.ClientId = clientCreated.Id;
-                Address addressCreated = await _addressService.CreateAddress(address);
+                Address addressCreated = await _addressService.Create(address);
 
                 ClientToken clientToken = await _tokenService.GenerateConfirmationCode(clientCreated);
                 string token = clientToken.Token;
@@ -268,27 +268,29 @@ namespace WebLuto.Controllers
                         return Conflict(new { Success = false, Entity = new { }, Message = string.Format(ClientMsg.EXC0002, clientRequest.Email) });
                 }
 
-                Client clientToUpdated = _mapper.Map<Client>(clientRequest);
+                existingClient = _mapper.Map<Client>(clientRequest);
 
-                if (clientToUpdated.Avatar != null)
+                if (existingClient.Avatar != null)
                 {
+                    /*
                     if (existingClient.Avatar != null)
                         clientToUpdated.Avatar = _fileService.UpdateImageStorage(existingClient.Avatar, clientToUpdated.Avatar, "images");
                     else
                         clientToUpdated.Avatar = _fileService.UploadBase64Image(clientToUpdated.Avatar, "images");
+                    */
                 }
 
-                Client clientUpdated = await _clientService.UpdateClient(clientToUpdated, existingClient);
+                Client clientUpdated = await _clientService.Update(existingClient);
 
                 Address existingAddress = await _addressService.GetAddressByClientId(existingClient.Id);
 
                 if (clientRequest.Address != null)
                 {
-                    Address addressToUpdated = _mapper.Map<Address>(clientRequest.Address);
-                    existingAddress = await _addressService.UpdateAddress(addressToUpdated, existingAddress);
+                    existingAddress = _mapper.Map<Address>(clientRequest.Address);
+                    existingAddress = await _addressService.Update(existingAddress);
                 }
 
-                if (clientToUpdated.IsConfirmed)
+                if (existingClient.IsConfirmed)
                     _emailService.SendEmail(clientUpdated, EmailTemplateType.AccountUpdate);
 
                 UpdateAddressResponse addressResponse = _mapper.Map<UpdateAddressResponse>(existingAddress);
@@ -323,12 +325,12 @@ namespace WebLuto.Controllers
                 if (existingClient == null)
                     return NotFound(new { Success = false, Entity = new { }, Message = ClientMsg.EXC0001 });
 
-                await _clientService.DeleteClient(existingClient);
+                await _clientService.Delete(existingClient);
 
                 Address address = await _addressService.GetAddressByClientId(existingClient.Id);
 
                 if (address != null)
-                    _addressService.DeleteAddress(address);
+                    await _addressService.Delete(address);
 
                 // if (existingClient.Avatar != null) _fileService.DeleteImageStorage(existingClient.Avatar, "images");
 

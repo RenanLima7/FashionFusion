@@ -5,6 +5,6 @@ namespace WebLuto.Repositories.Interfaces
 {
     public interface IAddressRepository : IBaseRepository
     {
-        Task<Address> GetAddressByClientId(long clientId);
+        Task<Address> GetAddressByClientIdAsync(long clientId);
     }
 }

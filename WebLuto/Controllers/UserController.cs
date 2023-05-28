@@ -72,7 +72,7 @@ namespace WebLuto.Controllers
         {
             try
             {
-                User user = await _userService.GetUserById(userId);
+                User user = await _userService.GetByIdAsync<User>(userId);
 
                 if (user == null)
                     return NotFound(new { Success = false, Message = $"Não foi encontrado nenhum usuário com o Id: {userId}" });
@@ -96,9 +96,9 @@ namespace WebLuto.Controllers
         {
             try
             {
-                List<User> userList = await _userService.GetAllUsers();
+                IEnumerable<User> userList = await _userService.GetAllAsync<User>();
 
-                if (userList == null || userList.Count == 0)
+                if (!userList.Any())
                     return NotFound(new { Success = false, Message = $"Não foi encontrado nenhum usuário" });
                 else
                 {
@@ -133,7 +133,7 @@ namespace WebLuto.Controllers
                 {
                     User user = _mapper.Map<User>(userRequest);
 
-                    User userCreated = await _userService.CreateUser(user);
+                    User userCreated = await _userService.Create(user);
 
                     //string jwtToken = _tokenService.GenerateToken(userCreated.Username, user.Email, userCreated.Id);
 
@@ -155,7 +155,7 @@ namespace WebLuto.Controllers
         {
             try
             {
-                User existingUser = await _userService.GetUserById(id);
+                User existingUser = await _userService.GetByIdAsync<User>(id);
 
                 if (existingUser == null)
                     return NotFound(new { Success = false, Message = $"Não foi encontrado nenhum usuário com o Id: {id}" });
@@ -169,9 +169,9 @@ namespace WebLuto.Controllers
                         return Conflict(new { Success = false, Message = $"Já existe um usuário com o username: {userRequest.Username}" });
                 }
 
-                User userToUpdated = _mapper.Map<User>(userRequest);
+                existingUser = _mapper.Map<User>(userRequest);
 
-                User userUpdated = await _userService.UpdateUser(userToUpdated, existingUser);
+                User userUpdated = await _userService.Update(existingUser);
 
                 UpdateUserResponse userResponse = _mapper.Map<UpdateUserResponse>(userUpdated);
 
@@ -190,12 +190,12 @@ namespace WebLuto.Controllers
         {
             try
             {
-                User existingUser = await _userService.GetUserById(id);
+                User existingUser = await _userService.GetByIdAsync<User>(id);
 
                 if (existingUser == null)
                     return NotFound(new { Success = false, Message = $"Não foi encontrado nenhum usuário com o Id: {id}" });
 
-                bool successDeletedUser = await _userService.DeleteUser(existingUser);
+                bool successDeletedUser = await _userService.Delete(existingUser);
 
                 if (successDeletedUser)
                     return Ok(new { Success = true, User = $"Usuário {existingUser.Id} excluído com sucesso!" });

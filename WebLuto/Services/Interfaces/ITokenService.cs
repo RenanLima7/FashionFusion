@@ -2,7 +2,7 @@
 
 namespace WebLuto.Services.Interfaces
 {
-    public interface ITokenService
+    public interface ITokenService 
     {
         Task<ClientToken> GenerateConfirmationCode(Client client);
 
