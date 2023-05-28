@@ -13,12 +13,15 @@ namespace WebLuto.Data.Mapper
         {
             base.Configure(builder);
 
-            builder.Property(x => x.ZipCode).IsRequired().HasMaxLength(10);
-            builder.Property(x => x.AddressLine).IsRequired().HasMaxLength(250);
-            builder.Property(x => x.AddressLineNumber).IsRequired().HasMaxLength(7);
-            builder.Property(x => x.Neighborhood).IsRequired().HasMaxLength(100);
+            builder.Property(a => a.ZipCode).IsRequired().HasMaxLength(10);
+            builder.Property(a => a.AddressLine).IsRequired().HasMaxLength(250);
+            builder.Property(a => a.AddressLineNumber).IsRequired().HasMaxLength(7);
+            builder.Property(a => a.Neighborhood).IsRequired().HasMaxLength(100);
 
-            builder.Property(x => x.ClientId).IsRequired();
+            builder.Property(a => a.ClientId).IsRequired();
+            builder.HasOne(a => a.Client)
+                   .WithOne(c => c.Address)
+                   .HasForeignKey<Client>(c => c.Id);
         }
     }
 }

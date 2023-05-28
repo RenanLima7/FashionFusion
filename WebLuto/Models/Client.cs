@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using WebLuto.Common;
+﻿using WebLuto.Common;
 
 namespace WebLuto.Models
 {
@@ -24,5 +23,11 @@ namespace WebLuto.Models
         public DateTime? BirthDate { get; set; }
 
         public string? Avatar { get; set; }
+
+        #region Relationships
+        public Address Address { get; set; }
+
+        public ClientToken ClientToken { get; set; }
+        #endregion
     }
 }

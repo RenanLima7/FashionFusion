@@ -13,9 +13,12 @@ namespace WebLuto.DataContext.Mapper
         {
             base.Configure(builder);
 
-            builder.Property(x => x.ClientId).IsRequired();
-
             builder.Property(x => x.Token).IsRequired().HasMaxLength(10);
+
+            builder.Property(x => x.ClientId).IsRequired();
+            builder.HasOne(x => x.Client)
+                   .WithOne(c => c.ClientToken)
+                   .HasForeignKey<Client>(c => c.Id);
         }
     }
 }
