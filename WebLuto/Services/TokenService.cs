@@ -26,7 +26,7 @@ namespace WebLuto.Services
 
                 ClientToken clientToken = new ClientToken
                 {
-                    Client = client,
+                    //Client = client,
                     Token = token,
                     CreationDate= DateTime.Now
                 };
@@ -56,7 +56,7 @@ namespace WebLuto.Services
                         new Claim(ClaimTypes.Name, client.Email),
                         new Claim("UserId", client.Id.ToString())
                     }),
-                    Expires = DateTime.UtcNow.AddDays(7),
+                    Expires = DateTime.Now.AddDays(7),
                     SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(secretKey), SecurityAlgorithms.HmacSha256)
                 };
 
@@ -116,7 +116,7 @@ namespace WebLuto.Services
                 JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
                 JwtSecurityToken jwtToken = handler.ReadJwtToken(token);
 
-                return jwtToken.ValidTo < DateTime.UtcNow;
+                return jwtToken.ValidTo < DateTime.Now;
             }
             catch (Exception)
             {
@@ -166,7 +166,7 @@ namespace WebLuto.Services
                 var newTokenDescriptor = new SecurityTokenDescriptor
                 {
                     Subject = claimsPrincipal.Identity as ClaimsIdentity,
-                    Expires = DateTime.UtcNow.AddSeconds(1),
+                    Expires = DateTime.Now.AddSeconds(1),
                     SigningCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256Signature)
                 };
 
@@ -209,11 +209,15 @@ namespace WebLuto.Services
         {
             string token = new Random().Next(1111, 9999).ToString();
 
-            clientToken.CreationDate = DateTime.UtcNow;
-            clientToken.UpdateDate = DateTime.UtcNow;
-            clientToken.Token = token;
+            ClientToken newClientToken = new ClientToken
+            {
+                //Client = clientToken.Client,
+                Token = token,
+                CreationDate = clientToken.CreationDate,
+                UpdateDate = DateTime.Now
+            };
 
-            return await _tokenRepository.Update(clientToken);
+            return await _tokenRepository.Update(clientToken, newClientToken);
         }
     }
 }

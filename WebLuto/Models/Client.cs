@@ -27,7 +27,7 @@ namespace WebLuto.Models
         #region Relationships
         public Address Address { get; set; }
 
-        public ClientToken ClientToken { get; set; }
+        //public ClientToken ClientToken { get; set; }
         #endregion
     }
 }

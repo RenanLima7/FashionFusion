@@ -106,9 +106,9 @@ namespace WebLuto.Controllers
                 if (existingProduct == null)
                     return NotFound(new { Success = false, Message = $"Não foi encontrado nenhum produto com o Id: {id}" });
 
-                existingProduct = _mapper.Map<Product>(productRequest);
+                Product productUpdated = _mapper.Map<Product>(productRequest);
 
-                Product productUpdated = await _productService.Update(existingProduct);
+                productUpdated = await _productService.Update(existingProduct, productUpdated);
 
                 UpdateProductResponse productResponse = _mapper.Map<UpdateProductResponse>(productUpdated);
 

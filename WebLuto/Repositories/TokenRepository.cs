@@ -19,7 +19,7 @@ namespace WebLuto.Repositories
         {
             try
             {
-                return await _dbContext.ClientToken.FirstOrDefaultAsync(x => x.ClientId == id);
+                return null; // _dbContext.ClientToken.FirstOrDefaultAsync(x => x.ClientId == id);
             }
             catch (Exception ex)
             {

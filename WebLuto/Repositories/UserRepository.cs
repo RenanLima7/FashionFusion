@@ -33,7 +33,7 @@ namespace WebLuto.Repositories
         {
             try
             {
-                userToCreate.CreationDate = DateTime.UtcNow;
+                userToCreate.CreationDate = DateTime.Now;
                 userToCreate.Salt = UtilityMethods.GenerateSalt();
                 userToCreate.Password = Sha512Cryptographer.Encrypt(userToCreate.Password, userToCreate.Salt);
 

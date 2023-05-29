@@ -169,9 +169,9 @@ namespace WebLuto.Controllers
                         return Conflict(new { Success = false, Message = $"Já existe um usuário com o username: {userRequest.Username}" });
                 }
 
-                existingUser = _mapper.Map<User>(userRequest);
+                User userToUpdated = _mapper.Map<User>(userRequest);
 
-                User userUpdated = await _userService.Update(existingUser);
+                User userUpdated = await _userService.Update(existingUser, userToUpdated);
 
                 UpdateUserResponse userResponse = _mapper.Map<UpdateUserResponse>(userUpdated);
 

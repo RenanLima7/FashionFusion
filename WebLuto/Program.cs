@@ -3,6 +3,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
+using WebLuto.Common.Interfaces;
+using WebLuto.Common.Repository;
+using WebLuto.Common.Service;
 using WebLuto.DataContext;
 using WebLuto.Repositories;
 using WebLuto.Repositories.Interfaces;
@@ -125,6 +128,9 @@ namespace WebLuto
 
         private static void ConfigureServicesScopes(WebApplicationBuilder builder)
         {
+            builder.Services.AddScoped<IBaseService, BaseService>();
+            builder.Services.AddScoped<IBaseRepository, BaseRepository>();
+
             builder.Services.AddScoped<IUserRepository, UserRepository>();
             builder.Services.AddScoped<IUserService, UserService>();
 

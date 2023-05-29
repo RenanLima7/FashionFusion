@@ -9,7 +9,7 @@ namespace WebLuto.Services
     {
         private readonly IClientRepository _clientRepository;
 
-        public ClientService(IClientRepository clientRepository) : base(clientRepository) 
+        public ClientService(IClientRepository clientRepository) : base(clientRepository)
         {
             _clientRepository = clientRepository;
         }

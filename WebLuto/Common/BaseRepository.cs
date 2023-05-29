@@ -13,11 +13,11 @@ namespace WebLuto.Common.Repository
             _dbContext = wLContext;
         }
 
-        public async Task<IEnumerable<T>> GetAllAsync<T>() where T : class
+        public async Task<IEnumerable<T>> GetAllAsync<T>() where T : BaseEntity
         {
             try
             {
-                return await _dbContext.Set<T>().ToListAsync();
+                return await _dbContext.Set<T>().AsNoTracking().ToListAsync();
             }
             catch (Exception ex)
             {
@@ -25,7 +25,7 @@ namespace WebLuto.Common.Repository
             }
         }
 
-        public async Task<T> GetByIdAsync<T>(long id) where T : class
+        public async Task<T> GetByIdAsync<T>(long id) where T : BaseEntity
         {
             try
             {
@@ -37,10 +37,12 @@ namespace WebLuto.Common.Repository
             }
         }
 
-        public async Task<T> Create<T>(T entity) where T : class
+        public async Task<T> Create<T>(T entity) where T : BaseEntity
         {
             try
             {
+                entity.CreationDate = DateTime.Now;
+
                 await _dbContext.AddAsync(entity);
                 await _dbContext.SaveChangesAsync();
 
@@ -52,11 +54,13 @@ namespace WebLuto.Common.Repository
             }
         }
 
-        public async Task<T> Update<T>(T entity) where T : class
+        public async Task<T> Update<T, E>(T entity, E newEntity) where T : BaseEntity where E : BaseEntity
         {
             try
             {
-                _dbContext.Update(entity);
+                newEntity.UpdateDate = DateTime.Now;
+
+                _dbContext.Entry(entity).CurrentValues.SetValues(newEntity);
                 await _dbContext.SaveChangesAsync();
 
                 return entity;
@@ -67,7 +71,7 @@ namespace WebLuto.Common.Repository
             }
         }
 
-        public async Task<bool> Delete<T>(T entity) where T : class
+        public async Task<bool> Delete<T>(T entity) where T : BaseEntity
         {
             try
             {

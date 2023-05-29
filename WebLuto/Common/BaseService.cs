@@ -11,7 +11,7 @@ namespace WebLuto.Common.Service
             _baseRepository = baseRepository;
         }
 
-        public async Task<IEnumerable<T>> GetAllAsync<T>() where T : class
+        public async Task<IEnumerable<T>> GetAllAsync<T>() where T : BaseEntity
         {
             try
             {
@@ -23,7 +23,7 @@ namespace WebLuto.Common.Service
             }
         }
 
-        public async Task<T> GetByIdAsync<T>(long id) where T : class
+        public async Task<T> GetByIdAsync<T>(long id) where T : BaseEntity
         {
             try
             {
@@ -35,7 +35,7 @@ namespace WebLuto.Common.Service
             }
         }
 
-        public async Task<T> Create<T>(T entity) where T : class
+        public async Task<T> Create<T>(T entity) where T : BaseEntity
         {
             try
             {
@@ -47,11 +47,11 @@ namespace WebLuto.Common.Service
             }
         }
 
-        public async Task<T> Update<T>(T entity) where T : class
+        public async Task<T> Update<T, E>(T entity, E newEntity) where T : BaseEntity where E : BaseEntity
         {
             try
             {
-                return await _baseRepository.Update(entity);
+                return await _baseRepository.Update(entity, newEntity);
             }
             catch (Exception ex)
             {
@@ -59,7 +59,7 @@ namespace WebLuto.Common.Service
             }
         }
 
-        public async Task<bool> Delete<T>(T entity) where T : class
+        public async Task<bool> Delete<T>(T entity) where T : BaseEntity
         {
             try
             {

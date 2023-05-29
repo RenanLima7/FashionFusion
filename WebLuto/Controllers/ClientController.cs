@@ -7,6 +7,7 @@ using WebLuto.Models;
 using WebLuto.Models.Enums;
 using WebLuto.Security;
 using WebLuto.Services.Interfaces;
+using WebLuto.Utils;
 using WebLuto.Utils.Messages;
 
 namespace WebLuto.Controllers
@@ -103,7 +104,7 @@ namespace WebLuto.Controllers
                 if (clientToken == null)
                     return NotFound(new { Success = false, Entity = new { }, Message = TokenMsg.EXC0001 });
 
-                Client client = await _clientService.GetByIdAsync<Client>(clientToken.ClientId);
+                Client client = await _clientService.GetByIdAsync<Client>(15);//clientToken.ClientId);
 
                 if (client == null)
                     return NotFound(new { Success = false, Entity = new { }, Message = ClientMsg.EXC0001 });
@@ -148,7 +149,7 @@ namespace WebLuto.Controllers
 
                 if (clientToken == null)
                     token = _tokenService.GenerateConfirmationCode(client).Result.Token;
-                else if (clientToken.CreationDate >= DateTime.UtcNow.AddMinutes(-5))
+                else if (clientToken.CreationDate >= DateTime.Now.AddMinutes(-5))
                     token = clientToken.Token;
                 else
                     token = _tokenService.ResendToken(clientToken).Result.Token;
@@ -218,6 +219,10 @@ namespace WebLuto.Controllers
                 if (!string.IsNullOrEmpty(client.Avatar))
                     client.Avatar = _fileService.UploadBase64Image(client.Avatar, "images");
 
+                client.Salt = UtilityMethods.GenerateSalt();
+                client.Password = Sha512Cryptographer.Encrypt(client.Password, client.Salt);
+                client.IsConfirmed = false;
+
                 Client clientCreated = await _clientService.Create(client);
 
                 Address address = _mapper.Map<Address>(clientRequest.Address);
@@ -225,9 +230,8 @@ namespace WebLuto.Controllers
                 Address addressCreated = await _addressService.Create(address);
 
                 ClientToken clientToken = await _tokenService.GenerateConfirmationCode(clientCreated);
-                string token = clientToken.Token;
 
-                _emailService.SendEmail(clientCreated, EmailTemplateType.EmailConfirmation, token);
+                _emailService.SendEmail(clientCreated, EmailTemplateType.EmailConfirmation, clientToken.Token);
 
                 CreateClientResponse clientResponse = _mapper.Map<CreateClientResponse>(clientCreated);
                 CreateAddressResponse addressResponse = _mapper.Map<CreateAddressResponse>(addressCreated);
@@ -268,7 +272,12 @@ namespace WebLuto.Controllers
                         return Conflict(new { Success = false, Entity = new { }, Message = string.Format(ClientMsg.EXC0002, clientRequest.Email) });
                 }
 
-                existingClient = _mapper.Map<Client>(clientRequest);
+                Client clientUpdated = _mapper.Map<Client>(clientRequest);
+
+                if (!string.IsNullOrEmpty(clientRequest.Password))
+                {
+                    clientUpdated.Password = Sha512Cryptographer.Encrypt(clientUpdated.Password, existingClient.Salt);
+                }
 
                 if (existingClient.Avatar != null)
                 {
@@ -280,14 +289,14 @@ namespace WebLuto.Controllers
                     */
                 }
 
-                Client clientUpdated = await _clientService.Update(existingClient);
+                clientUpdated = await _clientService.Update(existingClient, clientUpdated);
 
                 Address existingAddress = await _addressService.GetAddressByClientId(existingClient.Id);
 
                 if (clientRequest.Address != null)
                 {
-                    existingAddress = _mapper.Map<Address>(clientRequest.Address);
-                    existingAddress = await _addressService.Update(existingAddress);
+                    Address addressToUpdated = _mapper.Map<Address>(clientRequest.Address);
+                    existingAddress = await _addressService.Update(existingAddress, addressToUpdated);
                 }
 
                 if (existingClient.IsConfirmed)
