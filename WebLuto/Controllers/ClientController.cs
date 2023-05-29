@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebLuto.DataContext;
 using WebLuto.DataContract.Requests;
@@ -63,6 +64,7 @@ namespace WebLuto.Controllers
 
         [HttpPost]
         [Route("login")]
+        [AllowAnonymous]
         public async Task<ActionResult<dynamic>> Login([FromBody] LoginRequest loginRequest)
         {
             try
@@ -95,6 +97,7 @@ namespace WebLuto.Controllers
 
         [HttpGet]
         [Route("confirmAccount/{token}")]
+        [AllowAnonymous]
         public async Task<ActionResult<dynamic>> ConfirmAccount(string token)
         {
             try
@@ -203,6 +206,7 @@ namespace WebLuto.Controllers
 
         [HttpPost]
         [Route("createClient")]
+        [AllowAnonymous]
         public async Task<ActionResult<dynamic>> CreateClient([FromBody] CreateClientRequest clientRequest)
         {
             WLTransaction wLTransaction = new WLTransaction();
