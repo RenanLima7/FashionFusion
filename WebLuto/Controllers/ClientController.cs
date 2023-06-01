@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebLuto.DataContext;
 using WebLuto.DataContract.Requests;
@@ -7,6 +8,7 @@ using WebLuto.Models;
 using WebLuto.Models.Enums;
 using WebLuto.Security;
 using WebLuto.Services.Interfaces;
+using WebLuto.Utils;
 using WebLuto.Utils.Messages;
 
 namespace WebLuto.Controllers
@@ -62,6 +64,7 @@ namespace WebLuto.Controllers
 
         [HttpPost]
         [Route("login")]
+        [AllowAnonymous]
         public async Task<ActionResult<dynamic>> Login([FromBody] LoginRequest loginRequest)
         {
             try
@@ -69,7 +72,7 @@ namespace WebLuto.Controllers
                 Client client = await _clientService.GetClientByEmail(loginRequest.Email);
 
                 if (client == null)
-                    return NotFound(new { Success = false, Message = ClientMsg.EXC0001 });
+                    return NotFound(new { Success = false, Entity = new { }, Message = ClientMsg.EXC0001 });
 
                 bool isValidPassword = Sha512Cryptographer.Compare(loginRequest.Password, client.Salt, client.Password);
 
@@ -94,6 +97,7 @@ namespace WebLuto.Controllers
 
         [HttpGet]
         [Route("confirmAccount/{token}")]
+        [AllowAnonymous]
         public async Task<ActionResult<dynamic>> ConfirmAccount(string token)
         {
             try
@@ -103,7 +107,7 @@ namespace WebLuto.Controllers
                 if (clientToken == null)
                     return NotFound(new { Success = false, Entity = new { }, Message = TokenMsg.EXC0001 });
 
-                Client client = await _clientService.GetClientById(clientToken.ClientId);
+                Client client = await _clientService.GetByIdAsync<Client>(15);//clientToken.ClientId);
 
                 if (client == null)
                     return NotFound(new { Success = false, Entity = new { }, Message = ClientMsg.EXC0001 });
@@ -131,7 +135,7 @@ namespace WebLuto.Controllers
         public async Task<ActionResult<dynamic>> ResendToken()
         {
             try
-            {                
+            {
                 Client client = await _clientService.GetClientByEmail(User.Identity.Name);
 
                 if (client == null)
@@ -145,10 +149,10 @@ namespace WebLuto.Controllers
                 string token;
 
                 ClientToken clientToken = await _tokenService.GetClientTokenByClientId(client.Id);
-                
+
                 if (clientToken == null)
                     token = _tokenService.GenerateConfirmationCode(client).Result.Token;
-                else if (clientToken.CreationDate >= DateTime.UtcNow.AddMinutes(-5))
+                else if (clientToken.CreationDate >= DateTime.Now.AddMinutes(-5))
                     token = clientToken.Token;
                 else
                     token = _tokenService.ResendToken(clientToken).Result.Token;
@@ -170,9 +174,9 @@ namespace WebLuto.Controllers
         {
             try
             {
-                List<Client> clientList = await _clientService.GetAllClients(); // ToDo - Paginação
+                IEnumerable<Client> clientList = await _clientService.GetAllAsync<Client>(); // ToDo - Paginação
 
-                if (clientList == null || clientList.Count == 0)
+                if (!clientList.Any())
                     return NotFound(new { Success = false, Entity = new { }, Message = ClientMsg.EXC0001 });
                 else
                 {
@@ -202,6 +206,7 @@ namespace WebLuto.Controllers
 
         [HttpPost]
         [Route("createClient")]
+        [AllowAnonymous]
         public async Task<ActionResult<dynamic>> CreateClient([FromBody] CreateClientRequest clientRequest)
         {
             WLTransaction wLTransaction = new WLTransaction();
@@ -215,19 +220,22 @@ namespace WebLuto.Controllers
 
                 Client client = _mapper.Map<Client>(clientRequest);
 
-                if (client.Avatar != null)
+                if (!string.IsNullOrEmpty(client.Avatar))
                     client.Avatar = _fileService.UploadBase64Image(client.Avatar, "images");
 
-                Client clientCreated = await _clientService.CreateClient(client);
+                client.Salt = UtilityMethods.GenerateSalt();
+                client.Password = Sha512Cryptographer.Encrypt(client.Password, client.Salt);
+                client.IsConfirmed = false;
+
+                Client clientCreated = await _clientService.Create(client);
 
                 Address address = _mapper.Map<Address>(clientRequest.Address);
                 address.ClientId = clientCreated.Id;
-                Address addressCreated = await _addressService.CreateAddress(address);
+                Address addressCreated = await _addressService.Create(address);
 
                 ClientToken clientToken = await _tokenService.GenerateConfirmationCode(clientCreated);
-                string token = clientToken.Token;
 
-                _emailService.SendEmail(clientCreated, EmailTemplateType.EmailConfirmation, token);
+                _emailService.SendEmail(clientCreated, EmailTemplateType.EmailConfirmation, clientToken.Token);
 
                 CreateClientResponse clientResponse = _mapper.Map<CreateClientResponse>(clientCreated);
                 CreateAddressResponse addressResponse = _mapper.Map<CreateAddressResponse>(addressCreated);
@@ -268,27 +276,34 @@ namespace WebLuto.Controllers
                         return Conflict(new { Success = false, Entity = new { }, Message = string.Format(ClientMsg.EXC0002, clientRequest.Email) });
                 }
 
-                Client clientToUpdated = _mapper.Map<Client>(clientRequest);
+                Client clientUpdated = _mapper.Map<Client>(clientRequest);
 
-                if (clientToUpdated.Avatar != null)
+                if (!string.IsNullOrEmpty(clientRequest.Password))
                 {
+                    clientUpdated.Password = Sha512Cryptographer.Encrypt(clientUpdated.Password, existingClient.Salt);
+                }
+
+                if (existingClient.Avatar != null)
+                {
+                    /*
                     if (existingClient.Avatar != null)
                         clientToUpdated.Avatar = _fileService.UpdateImageStorage(existingClient.Avatar, clientToUpdated.Avatar, "images");
                     else
                         clientToUpdated.Avatar = _fileService.UploadBase64Image(clientToUpdated.Avatar, "images");
+                    */
                 }
 
-                Client clientUpdated = await _clientService.UpdateClient(clientToUpdated, existingClient);
+                clientUpdated = await _clientService.Update(existingClient, clientUpdated);
 
                 Address existingAddress = await _addressService.GetAddressByClientId(existingClient.Id);
 
                 if (clientRequest.Address != null)
                 {
                     Address addressToUpdated = _mapper.Map<Address>(clientRequest.Address);
-                    existingAddress = await _addressService.UpdateAddress(addressToUpdated, existingAddress);
+                    existingAddress = await _addressService.Update(existingAddress, addressToUpdated);
                 }
 
-                if (clientToUpdated.IsConfirmed)
+                if (existingClient.IsConfirmed)
                     _emailService.SendEmail(clientUpdated, EmailTemplateType.AccountUpdate);
 
                 UpdateAddressResponse addressResponse = _mapper.Map<UpdateAddressResponse>(existingAddress);
@@ -323,12 +338,12 @@ namespace WebLuto.Controllers
                 if (existingClient == null)
                     return NotFound(new { Success = false, Entity = new { }, Message = ClientMsg.EXC0001 });
 
-                await _clientService.DeleteClient(existingClient);
+                await _clientService.Delete(existingClient);
 
                 Address address = await _addressService.GetAddressByClientId(existingClient.Id);
 
                 if (address != null)
-                    _addressService.DeleteAddress(address);
+                    await _addressService.Delete(address);
 
                 // if (existingClient.Avatar != null) _fileService.DeleteImageStorage(existingClient.Avatar, "images");
 

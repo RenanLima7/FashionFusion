@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using WebLuto.DataContext;
@@ -11,9 +12,11 @@ using WebLuto.DataContext;
 namespace WebLuto.Migrations
 {
     [DbContext(typeof(WLContext))]
-    partial class WLContextModelSnapshot : ModelSnapshot
+    [Migration("20230527221328_AddBaseMapper")]
+    partial class AddBaseMapper
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -46,6 +49,9 @@ namespace WebLuto.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<DateTime?>("DeletionDate")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("Neighborhood")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -61,6 +67,8 @@ namespace WebLuto.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ClientId");
+
                     b.ToTable("Address");
                 });
 
@@ -70,6 +78,8 @@ namespace WebLuto.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint");
 
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
                     b.Property<string>("Avatar")
                         .HasColumnType("text");
 
@@ -78,38 +88,35 @@ namespace WebLuto.Migrations
 
                     b.Property<string>("CPF")
                         .IsRequired()
-                        .HasMaxLength(15)
-                        .HasColumnType("character varying(15)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<DateTime?>("DeletionDate")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasMaxLength(250)
-                        .HasColumnType("character varying(250)");
+                        .HasColumnType("text");
 
                     b.Property<string>("FirstName")
                         .IsRequired()
-                        .HasMaxLength(25)
-                        .HasColumnType("character varying(25)");
+                        .HasColumnType("text");
 
                     b.Property<bool>("IsConfirmed")
                         .HasColumnType("boolean");
 
                     b.Property<string>("LastName")
                         .IsRequired()
-                        .HasMaxLength(25)
-                        .HasColumnType("character varying(25)");
+                        .HasColumnType("text");
 
                     b.Property<string>("Password")
                         .IsRequired()
-                        .HasMaxLength(250)
-                        .HasColumnType("character varying(250)");
+                        .HasColumnType("text");
 
                     b.Property<string>("Phone")
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
+                        .HasColumnType("text");
 
                     b.Property<int>("Salt")
                         .HasColumnType("integer");
@@ -130,7 +137,13 @@ namespace WebLuto.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
+                    b.Property<long>("ClientId")
+                        .HasColumnType("bigint");
+
                     b.Property<DateTime>("CreationDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("DeletionDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Token")
@@ -142,6 +155,8 @@ namespace WebLuto.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ClientId");
 
                     b.ToTable("ClientToken");
                 });
@@ -155,6 +170,9 @@ namespace WebLuto.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
                     b.Property<DateTime>("CreationDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("DeletionDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Dimension")
@@ -197,6 +215,9 @@ namespace WebLuto.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<DateTime?>("DeletionDate")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("text");
@@ -221,21 +242,26 @@ namespace WebLuto.Migrations
                     b.ToTable("User");
                 });
 
-            modelBuilder.Entity("WebLuto.Models.Client", b =>
+            modelBuilder.Entity("WebLuto.Models.Address", b =>
                 {
-                    b.HasOne("WebLuto.Models.Address", "Address")
-                        .WithOne("Client")
-                        .HasForeignKey("WebLuto.Models.Client", "Id")
+                    b.HasOne("WebLuto.Models.Client", "Client")
+                        .WithMany()
+                        .HasForeignKey("ClientId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Address");
+                    b.Navigation("Client");
                 });
 
-            modelBuilder.Entity("WebLuto.Models.Address", b =>
+            modelBuilder.Entity("WebLuto.Models.ClientToken", b =>
                 {
-                    b.Navigation("Client")
+                    b.HasOne("WebLuto.Models.Client", "Client")
+                        .WithMany()
+                        .HasForeignKey("ClientId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Client");
                 });
 #pragma warning restore 612, 618
         }

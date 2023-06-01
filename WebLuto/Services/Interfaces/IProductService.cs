@@ -1,17 +1,8 @@
-﻿using WebLuto.Models;
+﻿using WebLuto.Common.Interfaces;
 
 namespace WebLuto.Services.Interfaces
 {
-    public interface IProductService
+    public interface IProductService : IBaseService
     {
-        Task<List<Product>> GetAllProducts();
-
-        Task<Product> GetProductById(long id);
-
-        Task<Product> CreateProduct(Product productToCreate);
-
-        Task<Product> UpdateProduct(Product productToUpdate, Product existingProduct);
-
-        Task<bool> DeleteProduct(Product productToDelete);
     }
 }

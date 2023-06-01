@@ -1,6 +1,6 @@
 ﻿namespace WebLuto.Services.Interfaces
 {
-    public interface IFileService
+    public interface IFileService 
     {
         string UploadBase64Image(string base64Image, string container);
 

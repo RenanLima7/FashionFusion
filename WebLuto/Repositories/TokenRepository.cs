@@ -1,46 +1,25 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using WebLuto.Common.Repository;
 using WebLuto.DataContext;
 using WebLuto.Models;
 using WebLuto.Repositories.Interfaces;
 
 namespace WebLuto.Repositories
 {
-    public class TokenRepository : ITokenRepository
+    public class TokenRepository : BaseRepository, ITokenRepository
     {
         private readonly WLContext _dbContext;
 
-        public TokenRepository(WLContext wLContext)
+        public TokenRepository(WLContext wLContext) : base(wLContext)
         {
             _dbContext = wLContext;
-        }
-
-        public async Task<ClientToken> CreateClientToken(ClientToken clientToken)
-        {
-            try
-            {
-                clientToken.CreationDate = DateTime.Now;
-
-                await _dbContext.ClientToken.AddAsync(clientToken);
-                await _dbContext.SaveChangesAsync();
-
-                return clientToken;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(string.Format($"Erro ao salvar o token de confirmação - {ex.Message}"));
-            }
         }
 
         public async Task<ClientToken> GetClientTokenByClientId(long id)
         {
             try
             {
-                return await _dbContext.ClientToken.FirstOrDefaultAsync
-                (
-                x =>
-                    x.ClientId == id &&
-                    x.DeletionDate == null
-                );
+                return null; // _dbContext.ClientToken.FirstOrDefaultAsync(x => x.ClientId == id);
             }
             catch (Exception ex)
             {
@@ -56,28 +35,12 @@ namespace WebLuto.Repositories
                 (
                     x =>
                     x.Token == token &&
-                    x.DeletionDate == null &&
-                    x.CreationDate >= DateTime.UtcNow.AddMinutes(-5)
+                    x.CreationDate >= DateTime.Now.AddMinutes(-5)
                 );
             }
             catch (Exception ex)
             {
                 throw new Exception($"Erro ao buscar o token de confirmação - {ex.Message}");
-            }
-        }
-
-        public async Task<ClientToken> UpdateClientToken(ClientToken clientToken)
-        {
-            try
-            {
-                _dbContext.ClientToken.Update(clientToken);
-                await _dbContext.SaveChangesAsync();
-
-                return clientToken;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(string.Format($"Erro ao atualizar o token de confirmação - {ex.Message}"));
             }
         }
     }

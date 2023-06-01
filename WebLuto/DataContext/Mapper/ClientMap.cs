@@ -1,14 +1,14 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
+﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using WebLuto.Common;
 using WebLuto.Models;
 
 namespace WebLuto.Data.Mapper
 {
-    public class ClientMap : IEntityTypeConfiguration<Client>
+    public class ClientMap : BaseMapper<Client>
     {
-        public void Configure(EntityTypeBuilder<Client> builder)
+        public override void Configure(EntityTypeBuilder<Client> builder)
         {
-            builder.HasKey(x => x.Id);
+            base.Configure(builder);
 
             builder.Property(x => x.Email).IsRequired().HasMaxLength(250);
             builder.Property(x => x.Password).IsRequired().HasMaxLength(250);
@@ -21,9 +21,6 @@ namespace WebLuto.Data.Mapper
             builder.Property(x => x.Phone).HasMaxLength(20);
             builder.Property(x => x.BirthDate);
             builder.Property(x => x.Avatar);
-            builder.Property(x => x.CreationDate).IsRequired();
-            builder.Property(x => x.UpdateDate);
-            builder.Property(x => x.DeletionDate);
         }
     }
 }

@@ -1,40 +1,17 @@
-﻿using WebLuto.Models;
+﻿using WebLuto.Common.Service;
+using WebLuto.Models;
 using WebLuto.Repositories.Interfaces;
 using WebLuto.Services.Interfaces;
 
 namespace WebLuto.Services
 {
-    public class ClientService : IClientService
+    public class ClientService : BaseService, IClientService
     {
         private readonly IClientRepository _clientRepository;
 
-        public ClientService(IClientRepository clientRepository)
+        public ClientService(IClientRepository clientRepository) : base(clientRepository)
         {
             _clientRepository = clientRepository;
-        }
-
-        public async Task<List<Client>> GetAllClients()
-        {
-            try
-            {
-                return await _clientRepository.GetAllClients();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
-        }
-
-        public async Task<Client> GetClientById(long id)
-        {
-            try
-            {
-                return await _clientRepository.GetClientById(id);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
         }
 
         public async Task<Client> GetClientByEmail(string email)
@@ -42,43 +19,6 @@ namespace WebLuto.Services
             try
             {
                 return await _clientRepository.GetClientByEmail(email);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
-        }
-
-        public async Task<Client> CreateClient(Client clientToCreate)
-        {
-            try
-            {
-                return await _clientRepository.CreateClient(clientToCreate);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
-        }
-
-        public async Task<Client> UpdateClient(Client clientToUpdate, Client existingClient)
-        {
-            try
-            {
-                return await _clientRepository.UpdateClient(clientToUpdate, existingClient);
-
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
-        }
-
-        public async Task<bool> DeleteClient(Client clientToDelete)
-        {
-            try
-            {
-                return await _clientRepository.DeleteClient(clientToDelete);
             }
             catch (Exception ex)
             {

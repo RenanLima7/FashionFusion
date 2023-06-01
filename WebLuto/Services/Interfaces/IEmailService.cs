@@ -1,9 +1,10 @@
-﻿using WebLuto.Models;
+﻿using WebLuto.Common.Interfaces;
+using WebLuto.Models;
 using WebLuto.Models.Enums;
 
 namespace WebLuto.Services.Interfaces
 {
-    public interface IEmailService
+    public interface IEmailService 
     {
         void SendEmail(Client client, EmailTemplateType emailTemplateType, string token = null);
 

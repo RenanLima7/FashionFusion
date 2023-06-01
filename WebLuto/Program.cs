@@ -3,6 +3,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
+using WebLuto.Common.Interfaces;
+using WebLuto.Common.Repository;
+using WebLuto.Common.Service;
 using WebLuto.DataContext;
 using WebLuto.Repositories;
 using WebLuto.Repositories.Interfaces;
@@ -85,14 +88,16 @@ namespace WebLuto
 
             #region DataBase Connection
 
-            builder.Services.AddEntityFrameworkSqlServer()
+            builder.Services.AddEntityFrameworkNpgsql()
                 .AddDbContext<WLContext>(
-                    options => options.UseSqlServer(builder.Configuration.GetConnectionString("DataBase"))
+                    options => options.UseNpgsql(builder.Configuration.GetConnectionString("DATABASE_URL"))
                 );
 
             #endregion
 
             var app = builder.Build();
+
+            AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
             app.UseSwagger();
             app.UseSwaggerUI();
@@ -123,6 +128,9 @@ namespace WebLuto
 
         private static void ConfigureServicesScopes(WebApplicationBuilder builder)
         {
+            builder.Services.AddScoped<IBaseService, BaseService>();
+            builder.Services.AddScoped<IBaseRepository, BaseRepository>();
+
             builder.Services.AddScoped<IUserRepository, UserRepository>();
             builder.Services.AddScoped<IUserService, UserService>();
 

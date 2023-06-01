@@ -19,7 +19,7 @@
         {
             get
             {
-                return _configuration.GetConnectionString("DataBase");
+                return _configuration.GetConnectionString("DATABASE_URL");
             }
         }
 
@@ -52,14 +52,6 @@
             get
             {
                 return _configuration.GetValue<string>("DefaultUrlApi");
-            }
-        }
-
-        public string AzureStorage
-        {
-            get
-            {
-                return _configuration.GetConnectionString("AzureStorage");
             }
         }
     }
