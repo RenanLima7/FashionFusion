@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using WebLuto.DataContext;
 using WebLuto.DataContract.Requests;
@@ -43,7 +44,11 @@ namespace WebLuto.Controllers
         {
             try
             {
-                Client client = await _clientService.GetClientByEmail(User.Identity.Name);
+                string authorizationHeader = HttpContext.Request.Headers["Authorization"];
+
+                long clientId = _tokenService.GetUserIdFromJWTToken(authorizationHeader);
+
+                Client client = await _clientService.GetByIdAsync<Client>(clientId);
 
                 if (client == null)
                     return Unauthorized(new { Success = false, Message = TokenMsg.EXC0001 });

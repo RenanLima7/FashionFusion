@@ -129,6 +129,8 @@ namespace WebLuto.Services
             try
             {
                 JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
+
+                token = token.Substring("Bearer ".Length).Trim();                
                 JwtSecurityToken jwtToken = handler.ReadJwtToken(token);
 
                 string userid = jwtToken.Claims.FirstOrDefault(c => c.Type == "UserId")?.Value;

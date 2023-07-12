@@ -10,7 +10,7 @@ namespace WebLuto.DataContract.Requests
         [Required, MaxLength(250)]
         public string AddressLine { get; set; }
 
-        [Required, MaxLength(7)]
+        [Required]
         public string AddressLineNumber { get; set; }
 
         [Required, MaxLength(100)]

@@ -15,7 +15,7 @@ namespace WebLuto.Data.Mapper
 
             builder.Property(a => a.ZipCode).IsRequired().HasMaxLength(10);
             builder.Property(a => a.AddressLine).IsRequired().HasMaxLength(250);
-            builder.Property(a => a.AddressLineNumber).IsRequired().HasMaxLength(7);
+            builder.Property(a => a.AddressLineNumber).IsRequired();
             builder.Property(a => a.Neighborhood).IsRequired().HasMaxLength(100);
 
             builder.Property(a => a.ClientId).IsRequired();
