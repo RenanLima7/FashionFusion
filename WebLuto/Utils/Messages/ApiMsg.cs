@@ -5,7 +5,7 @@
         #region EXCEPTIONS (EXC0000)
 
         public const string EXC0001 = "Email ou senha inválidos!";
-        public const string EXC0002 = "";
+        public const string EXC0002 = "Houve um erro no sistema, tente novamente mais tarde!";
         public const string EXC0003 = "";
         public const string EXC0004 = "";
         public const string EXC0005 = "";

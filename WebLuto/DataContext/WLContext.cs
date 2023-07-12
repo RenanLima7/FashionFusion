@@ -20,6 +20,8 @@ namespace WebLuto.DataContext
         public DbSet<Client> Client { get; set; }
         public DbSet<Address> Address { get; set; }
         public DbSet<ClientToken> ClientToken { get; set; }
+        //public DbSet<Card> Card { get; set; }
+        public DbSet<Sale> Sale { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -28,6 +30,8 @@ namespace WebLuto.DataContext
             modelBuilder.ApplyConfiguration(new ClientMap());
             modelBuilder.ApplyConfiguration(new AddressMap());
             modelBuilder.ApplyConfiguration(new ClientTokenMap());
+            modelBuilder.ApplyConfiguration(new SaleMap());
+            //modelBuilder.ApplyConfiguration(new CardMap());
 
             base.OnModelCreating(modelBuilder);
         }

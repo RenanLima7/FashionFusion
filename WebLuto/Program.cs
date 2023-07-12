@@ -115,6 +115,8 @@ namespace WebLuto
 
             app.MapControllers();
 
+            app.UseExceptionHandler("/error");
+
             app.Run();
         }
 
@@ -145,6 +147,9 @@ namespace WebLuto
 
             builder.Services.AddScoped<ITokenService, TokenService>();
             builder.Services.AddScoped<ITokenRepository, TokenRepository>();
+
+            builder.Services.AddScoped<ISaleService, SaleService>();
+            builder.Services.AddScoped<ISaleRepository, SaleRepository>();
 
             builder.Services.AddScoped<IEmailService, EmailService>();
 

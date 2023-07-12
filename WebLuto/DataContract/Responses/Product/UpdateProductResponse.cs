@@ -10,8 +10,6 @@ namespace WebLuto.DataContract.Responses
 
         public decimal Price { get; set; }
 
-        public ProductType Type { get; set; }
-
         public int Quantity { get; set; }
 
         public string? Dimension { get; set; }

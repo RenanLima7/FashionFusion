@@ -12,8 +12,8 @@ using WebLuto.DataContext;
 namespace WebLuto.Migrations
 {
     [DbContext(typeof(WLContext))]
-    [Migration("20230712004627_ajustes")]
-    partial class ajustes
+    [Migration("20230712033920_UserCard")]
+    partial class UserCard
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -64,6 +64,47 @@ namespace WebLuto.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Address");
+                });
+
+            modelBuilder.Entity("WebLuto.Models.Card", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("CVV")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<long>("ClientId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ExpirationDate")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("FullName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Number")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("UpdateDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ClientId")
+                        .IsUnique();
+
+                    b.ToTable("Card");
                 });
 
             modelBuilder.Entity("WebLuto.Models.Client", b =>
@@ -177,15 +218,48 @@ namespace WebLuto.Migrations
                     b.Property<int>("Quantity")
                         .HasColumnType("integer");
 
-                    b.Property<int>("Type")
-                        .HasColumnType("integer");
-
                     b.Property<DateTime?>("UpdateDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
                     b.ToTable("Product");
+                });
+
+            modelBuilder.Entity("WebLuto.Models.Sale", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Card")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<long>("ClientId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ProductList")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("PurchaseDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<decimal>("TotalValue")
+                        .HasColumnType("numeric");
+
+                    b.Property<DateTime?>("UpdateDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Sale");
                 });
 
             modelBuilder.Entity("WebLuto.Models.User", b =>
@@ -223,6 +297,17 @@ namespace WebLuto.Migrations
                     b.ToTable("User");
                 });
 
+            modelBuilder.Entity("WebLuto.Models.Card", b =>
+                {
+                    b.HasOne("WebLuto.Models.Client", "Client")
+                        .WithOne("Card")
+                        .HasForeignKey("WebLuto.Models.Card", "ClientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Client");
+                });
+
             modelBuilder.Entity("WebLuto.Models.Client", b =>
                 {
                     b.HasOne("WebLuto.Models.Address", "Address")
@@ -237,6 +322,12 @@ namespace WebLuto.Migrations
             modelBuilder.Entity("WebLuto.Models.Address", b =>
                 {
                     b.Navigation("Client")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("WebLuto.Models.Client", b =>
+                {
+                    b.Navigation("Card")
                         .IsRequired();
                 });
 #pragma warning restore 612, 618

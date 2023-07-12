@@ -214,8 +214,6 @@ namespace WebLuto.Controllers
         [AllowAnonymous]
         public async Task<ActionResult<dynamic>> CreateClient([FromBody] CreateClientRequest clientRequest)
         {
-            WLTransaction wLTransaction = new WLTransaction();
-
             try
             {
                 Client clientExists = await _clientService.GetClientByEmail(clientRequest.Email);
@@ -238,15 +236,13 @@ namespace WebLuto.Controllers
                 address.ClientId = clientCreated.Id;
                 Address addressCreated = await _addressService.Create(address);
 
-                ClientToken clientToken = await _tokenService.GenerateConfirmationCode(clientCreated);
+                //ClientToken clientToken = await _tokenService.GenerateConfirmationCode(clientCreated);
 
-                _emailService.SendEmail(clientCreated, EmailTemplateType.EmailConfirmation, clientToken.Token);
+                _emailService.SendEmail(clientCreated, EmailTemplateType.EmailConfirmation, "1234");
 
                 CreateClientResponse clientResponse = _mapper.Map<CreateClientResponse>(clientCreated);
                 CreateAddressResponse addressResponse = _mapper.Map<CreateAddressResponse>(addressCreated);
                 clientResponse.Address = addressResponse;
-
-                wLTransaction.Commit();
 
                 Entity = new { Client = clientResponse };
 
@@ -254,7 +250,6 @@ namespace WebLuto.Controllers
             }
             catch (Exception ex)
             {
-                wLTransaction.Rollback();
                 return BadRequest(new { Success = false, Entity = new { }, ex.Message });
             }
         }

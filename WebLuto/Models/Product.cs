@@ -1,5 +1,4 @@
 ﻿using WebLuto.Common;
-using WebLuto.Models.Enums;
 
 namespace WebLuto.Models
 {
@@ -8,8 +7,6 @@ namespace WebLuto.Models
         public string Name { get; set; }
 
         public decimal Price { get; set; }
-
-        public ProductType Type { get; set; }
 
         public int Quantity { get; set; }
 

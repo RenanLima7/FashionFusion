@@ -13,9 +13,6 @@ namespace WebLuto.DataContract.Requests
         public decimal Price { get; set; }
 
         [Required]
-        public ProductType Type { get; set; }
-
-        [Required]
         public int Quantity { get; set; }
 
         [MaxLength(15)]

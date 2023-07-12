@@ -13,6 +13,7 @@ namespace WebLuto.Mapper
             ProductMap();
             ClientMap();
             AddressMap();
+            SaleMap();
         }
 
         public void UserMap()
@@ -30,17 +31,13 @@ namespace WebLuto.Mapper
 
         public void ProductMap()
         {
-            CreateMap<CreateProductRequest, Product>()
-                .ForMember(x => x.Type, options => options.MapFrom(y => y.Type));
+            CreateMap<CreateProductRequest, Product>();
 
-            CreateMap<Product, CreateProductResponse>()
-                .ForMember(x => x.Type, options => options.MapFrom(y => y.Type));
+            CreateMap<Product, CreateProductResponse>();
 
-            CreateMap<UpdateProductRequest, Product>()
-                .ForMember(x => x.Type, options => options.MapFrom(y => y.Type));
+            CreateMap<UpdateProductRequest, Product>();
 
-            CreateMap<Product, UpdateProductResponse>()
-                .ForMember(x => x.Type, options => options.MapFrom(y => y.Type));
+            CreateMap<Product, UpdateProductResponse>();
         }
 
         public void ClientMap()
@@ -67,6 +64,13 @@ namespace WebLuto.Mapper
             CreateMap<UpdateAddressRequest, Address>();
 
             CreateMap<Address, UpdateAddressResponse>();
+        }
+
+        private void SaleMap()
+        {
+            CreateMap<CreateSaleRequest, Sale>();
+
+            CreateMap<CreateCardRequest, Card>();
         }
     }
 }
