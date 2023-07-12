@@ -3,11 +3,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 using WebLuto.DataContract.Requests;
+using WebLuto.DataContract.Responses;
 using WebLuto.Models;
 using WebLuto.Security;
 using WebLuto.Services;
 using WebLuto.Services.Interfaces;
-using WebLuto.Utils.Messages;
 
 namespace WebLuto.Controllers
 {
@@ -46,11 +46,80 @@ namespace WebLuto.Controllers
 
                 Sale saleCreated = await _saleService.Create(sale);
 
+                List<Product> products = JsonSerializer.Deserialize<List<Product>>(saleCreated.ProductList);
+
+                foreach (var item in products)
+                {
+                    item.Id = item.ProductId;
+                }
+
+                string saleId = Guid.NewGuid().ToString().Split("-")[0];
+
                 object response = new
                 {
                     Success = true,
-                    Entity = new { saleCreated.Id, saleCreated.ClientId, saleCreated.PurchaseDate, saleCreated.TotalValue },
+                    Entity = new { 
+                        saleId, 
+                        saleCreated.ClientId, 
+                        saleCreated.PurchaseDate,
+                        products,
+                        saleCreated.TotalValue 
+                    },
                     Message = "Compra realizada com sucesso!"
+                };
+
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Success = false, ex.Message });
+            }
+        }
+
+        [HttpGet]
+        [Route("getAllSale")]
+        [WLToken]
+        public async Task<ActionResult<dynamic>> GetAllSale()
+        {
+            try
+            {
+                string authorizationHeader = HttpContext.Request.Headers["Authorization"];
+
+                long clientId = _tokenService.GetUserIdFromJWTToken(authorizationHeader);
+
+                IEnumerable<Sale> sales = await _saleService.GetAllSaleByClientId(clientId);
+
+                List<object> saleList = new List<object>();
+
+                foreach (var sale in sales)
+                {
+                    List<Product> products = JsonSerializer.Deserialize<List<Product>>(sale.ProductList);
+
+                    foreach (var item in products)
+                    {
+                        item.Id = item.ProductId;
+                    }
+
+                    object saleMapped = new 
+                    { 
+                        sale.Id,
+                        sale.TotalValue,
+                        sale.PurchaseDate,
+                        products
+                    };
+
+                    saleList.Add(saleMapped);
+                }
+
+                object response = new
+                {
+                    Success = true,
+                    Entity = new
+                    {
+                        clientId,
+                        saleList
+                    },
+                    Message = "Lista de compras carregada com sucesso!"
                 };
 
                 return Ok(response);

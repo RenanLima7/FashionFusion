@@ -11,11 +11,5 @@ namespace WebLuto.DataContract.Responses
         public decimal Price { get; set; }
 
         public int Quantity { get; set; }
-
-        public string? Dimension { get; set; }
-
-        public string? Image { get; set; }
-
-        public DateTime CreationDate { get; set; }
     }
 }

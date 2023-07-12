@@ -16,7 +16,7 @@ namespace WebLuto.DataContext
         { }
 
         public DbSet<User> User { get; set; }
-        public DbSet<Product> Product { get; set; }
+        //public DbSet<Product> Product { get; set; }
         public DbSet<Client> Client { get; set; }
         public DbSet<Address> Address { get; set; }
         public DbSet<ClientToken> ClientToken { get; set; }
@@ -26,7 +26,7 @@ namespace WebLuto.DataContext
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfiguration(new UserMap());
-            modelBuilder.ApplyConfiguration(new ProductMap());
+            //modelBuilder.ApplyConfiguration(new ProductMap());
             modelBuilder.ApplyConfiguration(new ClientMap());
             modelBuilder.ApplyConfiguration(new AddressMap());
             modelBuilder.ApplyConfiguration(new ClientTokenMap());

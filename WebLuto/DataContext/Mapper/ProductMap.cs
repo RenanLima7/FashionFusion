@@ -9,7 +9,7 @@ namespace WebLuto.Data.Mapper
         public ProductMap()
         { }
 
-        public override void Configure(EntityTypeBuilder<Product> builder)
+        public void Configure(EntityTypeBuilder<Product> builder)
         {
             base.Configure(builder);
 

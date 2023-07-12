@@ -54,9 +54,11 @@ namespace WebLuto.Controllers
                     return Unauthorized(new { Success = false, Message = TokenMsg.EXC0001 });
                 else
                 {
-                    LoginClientResponse loginResponse = _mapper.Map<LoginClientResponse>(client);
+                    //LoginClientResponse loginResponse = _mapper.Map<LoginClientResponse>(client);
 
-                    Entity = new { Client = loginResponse };
+                    client.Address = await _addressService.GetAddressByClientId(clientId);
+
+                    Entity = new { Client = client };
 
                     return Ok(new { Success = true, Entity, Message = ApiMsg.INF0001 });
                 }

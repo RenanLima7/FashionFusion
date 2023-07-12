@@ -6,6 +6,8 @@ namespace WebLuto.DataContract.Requests
 {
     public sealed class CreateProductRequest
     {
+        public int ProductId  { get; set; }
+
         [Required, MaxLength(250)]
         public string Name { get; set; }
 

@@ -34,7 +34,7 @@ namespace WebLuto.Mapper
             CreateMap<CreateProductRequest, Product>();
 
             CreateMap<Product, CreateProductResponse>();
-
+                        
             CreateMap<UpdateProductRequest, Product>();
 
             CreateMap<Product, UpdateProductResponse>();
